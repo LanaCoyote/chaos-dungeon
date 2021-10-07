@@ -1,0 +1,9 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "outDir": "../../build/services/web",
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules"]
+}
