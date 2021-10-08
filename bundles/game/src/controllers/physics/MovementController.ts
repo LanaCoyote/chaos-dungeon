@@ -5,9 +5,14 @@ import { UpdateController } from "../Controller";
 import Actor from "../../objects/actors/Actor";
 import { MOVESTATE } from "../../constants";
 
+export const EVENTS = {
+    MOVE: Symbol("[Event Move]"),
+    SHOVE: Symbol("[Event Shove]")
+}
+
 export default class MovementController extends ArcadePhysicsController implements UpdateController {
 
-    public acceleration: number = 400;
+    public acceleration: number = 600;
     public decelRate: number = 10;
     public intentWeight: number = 10;
     public mass: number = 1;
@@ -19,11 +24,25 @@ export default class MovementController extends ArcadePhysicsController implemen
 
     constructor(actor?: Actor, scene?: Scene) {
         super(actor, scene);
+
+        this.on(EVENTS.MOVE, (velocity: Math.Vector2) => this.move(velocity));
+        this.on(EVENTS.SHOVE, (velocity: Math.Vector2) => this.shove(velocity));
     }
 
     public attach(actor: Actor, scene?: Scene) {
         ArcadePhysicsController.prototype.attach.call(this, actor, scene);
         this.state = MOVESTATE.STOPPING;
+    }
+
+    public activate() {
+        this.active = true;
+        this.body.setEnable(true);
+    }
+
+    public deactivate() {
+        this.active = false;
+        this.body.setVelocity(0, 0);
+        this.body.setEnable(false);
     }
 
     public hasUpdateMethod(): true {
@@ -43,7 +62,12 @@ export default class MovementController extends ArcadePhysicsController implemen
     }
 
     public update(time: number, delta: number) {
-        if (!this.active) return;
+        if (!this.active) {
+            // throw out any movement commands while deactivated
+            delete this.impulse;
+            this.intents.length = 0;
+            return;
+        }
 
         // always apply impulses as-is
         if (this.impulse) {

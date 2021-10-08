@@ -1,9 +1,11 @@
-import { Math as Vectors, Scene, GameObjects, Physics } from "phaser";
+import { Math as Vectors, Scene, GameObjects, Physics, BlendModes } from "phaser";
 
 import { DEPTH_FLOOR } from "../../constants";
 import Actor from "./Actor";
+import InventoryController from "../../controllers/inventory/InventoryController";
 import MovementController from "../../controllers/physics/MovementController";
 import KbmInputController from "../../controllers/player/KbmInputController";
+import RoomCameraController from "../../controllers/player/RoomCameraController";
 
 export default class Hero extends Actor {
 
@@ -13,14 +15,22 @@ export default class Hero extends Actor {
         super(scene, origin, "hero");
 
         const movementController = new MovementController(this);
+        movementController.acceleration = 800;
+        movementController.maxSpeed = 180;
+        movementController.intentWeight = 25;
         movementController.activate();
+
+        const inventoryController = new InventoryController(this);
+        inventoryController.activate();
 
         const keyboardController = new KbmInputController(this);
         keyboardController.activate();
 
-        // players use 24x36 sprites but occupy a 18x18 area
-        this.body.setSize( 18, 18 );
-        this.body.setOffset( (this.width - 18) / 2, (this.height - 18) );
+        const roomCamController = new RoomCameraController(this, this.scene.cameras.main);
+        roomCamController.activate();
+
+        // players use 24x36 sprites but occupy a 9u ellipse
+        this.body.setCircle(6, (this.width - 12) / 2, this.height - 13);
 
         this.on( GameObjects.Events.ADDED_TO_SCENE, () => {
             this.setDepth( DEPTH_FLOOR + 2 );

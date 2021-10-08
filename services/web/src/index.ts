@@ -1,12 +1,16 @@
 import fs from 'fs';
 import express from 'express';
 
-import { Swap } from './middleware/Palette.js';
+import { SwapBear, SwapTiles } from './middleware/Palette.js';
+import { GetLevelData, GenerateLevel } from "./data/LevelData.js"; 
 
 const app = express();
 
 app.use('/static', express.static("./dist/static"));
-app.use('/bear', Swap);
+app.use('/bear', SwapBear);
+app.use('/tiles', SwapTiles);
+app.use('/level/data.json', GetLevelData);
+app.use('/level/f1.csv', GenerateLevel);
 
 app.get('/', (req, res) => {
     fs.readFile('./dist/static/index.html', 'utf8', (err, data) => {

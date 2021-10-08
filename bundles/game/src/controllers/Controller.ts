@@ -14,6 +14,7 @@ export interface Attachable {
     getController: (key: Symbol|Controller) => Controller;
     hasController: (key: Symbol) => boolean;
 
+    emit: (event: ControllerEventName, ...params: any) => void; // todo: make this type safe
     on: (event: ControllerEventName, cb: ControllerEventCb, context?: any) => any;
     removeListener: (event: ControllerEventName, cb: ControllerEventCb, context?: any) => any;
 };

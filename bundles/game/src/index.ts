@@ -10,7 +10,7 @@ class GameWindow {
     constructor(parent?: HTMLElement|string) {
         const gameConfig: Phaser.Types.Core.GameConfig = {
             width: SCREEN_WIDTH_ABS,
-            height: SCREEN_HEIGHT_ABS - 12,
+            height: SCREEN_HEIGHT_ABS,
             zoom: SCREEN_ZOOM,
 
             type: Phaser.AUTO,
@@ -23,7 +23,7 @@ class GameWindow {
             physics: {
                 default: 'arcade',
                 arcade: {
-                    debug: false
+                    debug: true
                 }
             },
 
@@ -32,6 +32,9 @@ class GameWindow {
 
         this.gameInstance = new Phaser.Game(gameConfig)
         console.log("game started");
+        console.log(this.gameInstance.renderer.type);
+
+        (window as any).isRunningCanvas = this.gameInstance.renderer.type === Phaser.CANVAS;
     }
 
 }

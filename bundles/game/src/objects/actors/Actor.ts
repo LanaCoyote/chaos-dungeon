@@ -71,6 +71,14 @@ export default abstract class Actor extends GameObjects.Sprite implements Refere
         return true;
     }
 
+    public deactivateAllControllers() {
+        this.controllers.forEach(ctrl => ctrl.deactivate());
+    }
+
+    public reactivateAllControllers() {
+        this.controllers.forEach(ctrl => ctrl.activate());
+    }
+
     public destroy() {
         if (this.controllers.size) {
             this.controllers.forEach(ctrl => {

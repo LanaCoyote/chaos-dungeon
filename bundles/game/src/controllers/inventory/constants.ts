@@ -16,6 +16,11 @@ export const EVENTS = {
     // For resetting the inventory after a dungeon and setting it up before a new game
     RESET_INVENTORY: Symbol("[Event ResetInventory]"),      // Resets the inventory to empty (no params)
     CHANGE_INVENTORY: Symbol("[Event ChangeInventory]"),    // Resets the inventory and adds the given items to it (items)
+
+    // Equipment Events
+    // For using currently equipped items
+    SHOOT_EQUIP: Symbol("[Event ShootEquip]"),      // Start using equipment (slot)
+    RELEASE_EQUIP: Symbol("[Event ReleaseEquip]"),  // Stop using equipment (slot)
 }
 
 // Item classes refer to "sets" of items

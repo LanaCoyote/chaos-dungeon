@@ -57,7 +57,7 @@ function getBundleTasks() {
             // add tasks to queue
             bundleTasks.push(task(`build:bundle:${bundle}:compile`));
             bundleTasks.push(task(`build:bundle:${bundle}:package`));
-            bundleTasks.push(task(`build:bundle:${bundle}:minify`));
+            // bundleTasks.push(task(`build:bundle:${bundle}:minify`));
         }
 
         // static bundle is special because it produces static files
