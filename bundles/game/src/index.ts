@@ -23,7 +23,7 @@ class GameWindow {
             physics: {
                 default: 'arcade',
                 arcade: {
-                    debug: true
+                    debug: false
                 }
             },
 
@@ -44,3 +44,9 @@ window.onload = () => {
     console.log("loaded game bundle");
     const game = new GameWindow('game-window');
 };
+
+document.addEventListener('contextmenu', (ev) => {
+    if ((ev.target as HTMLElement).tagName.toUpperCase() === "CANVAS") {
+        ev.preventDefault();
+    }
+});

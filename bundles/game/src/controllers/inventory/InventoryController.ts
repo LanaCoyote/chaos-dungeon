@@ -57,9 +57,11 @@ export default class InventoryController extends Controller {
     }
 
     public shootEquipment(slot: number) {
-        console.log("shooting", InventoryController.EquippedItems[slot - 1]);
-
         if (InventoryController.EquippedItems[slot - 1] === undefined) return;
+        if (InventoryController.EquippedItems.filter(slot => !slot.item.canUseAnotherItem(slot)).length) {
+            console.log("can't use another item now!");
+            return;
+        }
 
         InventoryController.EquippedItems[slot - 1].onShoot();
     }
