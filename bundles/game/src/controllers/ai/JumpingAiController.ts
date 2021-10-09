@@ -1,4 +1,4 @@
-import { Geom } from "phaser";
+import { Math as Vector, Geom } from "phaser";
 
 import AiController from "./AiController";
 import EnemyData from "./enemies/EnemyData";
@@ -6,6 +6,7 @@ import Hero from "../../objects/actors/Hero";
 import LevelScene from "../../scenes/level/LevelScene";
 
 import { DEPTH_FLOOR, DEPTH_FLYING } from "../../constants";
+import MovementController, { EVENTS as MOVEMENT_EVENTS } from "../physics/MovementController";
 
 export enum JumpingEnemyStates {
     STANDING,       // do nothing
@@ -25,6 +26,7 @@ export interface JumpingEnemyDataType extends EnemyData {
     shortHopDistance: number;   // how far the enemy will attempt to "short hop" at the player. set to 0 to disable
     sleepChance: number;        // 0-1, how likely they are to do nothing instead of jumping
     canLandOnWalls: boolean;    // whether or not this enemy will jump on solid tiles
+    canJumpConstantly: boolean; // if false, the enemy will always transition to standing after a jump
 
     onSleep: (ai: JumpingAiController) => void;
     onDecideToJump: (ai: JumpingAiController) => void;
@@ -37,16 +39,26 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
     public scene: LevelScene;
     public state: JumpingEnemyStates = JumpingEnemyStates.STANDING;
 
+    public onActivated() {
+        const move: MovementController = this.attached.getController(Symbol.for("[Controller MovementController]")) as MovementController;
+        move.decelRate = (4 * 1500) / this.data.jumpDuration;
+    }
+
     public onChangeState(oldState: JumpingEnemyStates, newState: JumpingEnemyStates) {
+        let jumpDestination: Geom.Point;
         switch (newState) {
             case JumpingEnemyStates.STANDING :
                 this.data.onSleep(this);
                 break;
+            case JumpingEnemyStates.SHORTHOP :
+            case JumpingEnemyStates.AGGRO_JUMPING :
+                jumpDestination = new Geom.Point( Hero.activeHero.x, Hero.activeHero.getBottomCenter().y );
+                // intentional fallthrough
             case JumpingEnemyStates.JUMPING :
+                if (!jumpDestination) jumpDestination = this.determineWhereToJump( jumpDestination );
                 this.scene.time.delayedCall( this.data.timeBeforeJump, () => {
-                    const destination = this.determineWhereToJump();
-                    if (destination) {
-                        this.jump( destination );
+                    if (jumpDestination) {
+                        this.jump( jumpDestination );
                         this.data.onJump(this);
                     } else {
                         console.log( "could not find a destination" );
@@ -67,29 +79,31 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
 
         if (this.state == JumpingEnemyStates.AGGRO_JUMPING) {
             return JumpingEnemyStates.JUMPING;
-        } else if (this.state != JumpingEnemyStates.STANDING) {
+        } else if (this.state != JumpingEnemyStates.STANDING && !this.data.canJumpConstantly) {
             return JumpingEnemyStates.STANDING;
         } else {
-            // if (Hero.activeHero) {
-            //     const divider = Hero.activeHero.body.position.subtract( this.attached.body.position );
-            //     if (this.data.shortHopDistance && divider.lengthSq() < this.data.shortHopDistance * this.data.shortHopDistance) {
-            //         return JumpingEnemyStates.SHORTHOP;
-            //     } else if (divider.lengthSq() < this.data.searchDistance * this.data.searchDistance) {
-            //         return JumpingEnemyStates.AGGRO_JUMPING;
-            //     }
-            // }
+            // see if the hero is nearby
+            if (Hero.activeHero) {
+                const divider = Hero.activeHero.body.position.subtract( this.attached.body.position );
+                if (this.data.shortHopDistance && divider.lengthSq() < this.data.shortHopDistance * this.data.shortHopDistance) {
+                    return JumpingEnemyStates.SHORTHOP;
+                
+                // if they're not close enough for a short hop, do an aggro jump
+                } else if (divider.lengthSq() < this.data.searchDistance * this.data.searchDistance && Math.random() < this.data.aggression) {
+                    return JumpingEnemyStates.AGGRO_JUMPING;
+                }
+            }
 
             return JumpingEnemyStates.JUMPING;
         }
     }
 
-    private determineWhereToJump(): Geom.Point {
-        let nextPoint: Geom.Point = undefined;
+    private determineWhereToJump( nextPoint: Geom.Point ): Geom.Point {
         let pointIsValid: boolean = false;
         const jumpableRadius = new Geom.Circle( this.attached.x, this.attached.y, this.data.jumpDistance );
         const currentFloor = this.scene.getCurrentFloor();
         for (let i = 0; i < 30 && !pointIsValid; ++i) {
-            nextPoint = jumpableRadius.getRandomPoint();
+            nextPoint = jumpableRadius.getRandomPoint( nextPoint );
             pointIsValid = currentFloor.getCurrentRoom().rect.contains( nextPoint.x, nextPoint.y );
             if (pointIsValid && !this.data.canLandOnWalls) {
                 if (currentFloor.tilemap.getTileAtWorldXY( nextPoint.x, nextPoint.y ).index === 1) {
@@ -102,7 +116,9 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
     }
 
     private jump( destination: Geom.Point ) {
+        const xMovement = destination.x - this.attached.x;
         this.attached.setBaseDepth( DEPTH_FLYING );
+        this.attached.emit( MOVEMENT_EVENTS.SHOVE, new Vector.Vector2( xMovement, this.data.jumpHeight * -1 ) );
 
         this.scene.tweens.add({
             targets: this.attached,
@@ -117,6 +133,8 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
             duration: this.data.jumpDuration / 2,
             ease: 'Sine',
             onComplete: () => {
+                this.attached.emit( MOVEMENT_EVENTS.SHOVE, new Vector.Vector2( xMovement, this.data.jumpHeight ) );
+
                 this.scene.tweens.add({
                     targets: this.attached,
                     y: destination.y,

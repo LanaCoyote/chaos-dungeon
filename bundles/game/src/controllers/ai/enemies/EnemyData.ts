@@ -8,6 +8,8 @@ export default abstract class EnemyData {
     public texture: string;
     public immunities: DAMAGETYPES[] = [];
     public weaknesses: DAMAGETYPES[] = [];
+    public minimumStateTime: number = 1000;
+    public maximumStateTime: number = 3000;
 
     public createController( attached: Actor ): AiController<EnemyData>|null {
         return null;

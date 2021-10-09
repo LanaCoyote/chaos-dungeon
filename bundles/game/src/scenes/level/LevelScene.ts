@@ -74,7 +74,7 @@ export default class LevelScene extends Scene {
         spawnArea.y += 96;
         spawnArea.width -= 240;
         spawnArea.height -= 192;
-        for (let i = 0; i < 80; ++ i) {
+        for (let i = 0; i < 8; ++ i) {
             const point = spawnArea.getRandomPoint();
             const jelly = new Enemy(this, new Math.Vector2(point.x, point.y), new Jelly());
             jelly.addToDisplayList();

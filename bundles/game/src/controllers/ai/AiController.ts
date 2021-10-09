@@ -16,17 +16,30 @@ export default abstract class AiController<EnemyDataType> extends Controller {
     constructor(data: EnemyDataType, attached?: Actor) {
         super(attached);
 
+        if ((data as any).minimumStateTime) this.minimumStateTime = (data as any).minimumStateTime;
+        if ((data as any).maximumStateTime) this.maximumStateTime = (data as any).maximumStateTime;
+
         this.setEnemyData(data);
     }
 
     public activate() {
         this.active = true;
+        this.onActivated();
         this.resetStateTimer();
     }
 
     public deactivate() {
         if (this.nextStateTimer) this.nextStateTimer.remove();
         this.active = false;
+        this.onDeactivated();
+    }
+
+    public onActivated() {
+
+    }
+
+    public onDeactivated() {
+
     }
 
     public onChangeState(oldState: number, newState: number) {
