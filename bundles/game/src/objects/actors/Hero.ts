@@ -9,6 +9,8 @@ import RoomCameraController from "../../controllers/player/RoomCameraController"
 
 export default class Hero extends Actor {
 
+    public static activeHero: Hero;
+
     public body: Physics.Arcade.Body;
 
     constructor(scene: Scene, origin: Vectors.Vector2) {
@@ -29,11 +31,13 @@ export default class Hero extends Actor {
         const roomCamController = new RoomCameraController(this, this.scene.cameras.main);
         roomCamController.activate();
 
+        Hero.activeHero = this;
+
         // players use 24x36 sprites but occupy a 9u ellipse
         this.body.setCircle(6, (this.width - 12) / 2, this.height - 13);
 
         this.on( GameObjects.Events.ADDED_TO_SCENE, () => {
-            this.setDepth( DEPTH_FLOOR + 2 );
+            this.setBaseDepth( DEPTH_FLOOR + 2 );
 
             setInterval(() => this.setFlipX(!this.flipX), 250);
         });

@@ -103,6 +103,11 @@ export default class MovementController extends ArcadePhysicsController implemen
             return;
         }
 
+        // set our depth from our position
+        if (this.attached.baseDepth) {
+            this.attached.setDepth( this.attached.baseDepth + this.attached.getBottomCenter().y );
+        }
+
         // always apply impulses as-is
         if (this.impulse) {
             this.state = MOVESTATE.IMPULSE;

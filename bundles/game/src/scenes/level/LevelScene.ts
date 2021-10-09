@@ -3,6 +3,9 @@ import { Scene, Types, Geom, Math, GameObjects } from "phaser";
 import Floor from "./Floor";
 import Actor from "../../objects/actors/Actor";
 import Hero from "../../objects/actors/Hero";
+import Enemy from "../../objects/actors/Enemy";
+import Jelly from "../../controllers/ai/enemies/Jelly";
+import JellyKing from "../../controllers/ai/enemies/JellyKing";
 import Flicker from "../../effects/Flicker";
 
 import { SCREEN_HEIGHT, SCREEN_HEIGHT_ABS, SCREEN_WIDTH_ABS, TILE_HEIGHT, TILE_WIDTH } from "../../constants";
@@ -30,8 +33,8 @@ export default class LevelScene extends Scene {
         this.load.image("actors/item/sword", "static/sword.png");
         this.load.image("actors/item/shield", "static/shield.png");
 
-        this.load.image("actors/jelly", "static/jelly.png");
-        this.load.image("actors/jelly_king", "static/jelly_king.png")
+        this.load.image("actors/enemy/jelly", "static/jelly.png");
+        this.load.image("actors/enemy/jelly_king", "static/jelly_king.png")
 
         this.load.tilemapCSV("tilemaps/F1", "level/f1.csv");
         this.load.json("data/level", "level/data.json");
@@ -63,17 +66,33 @@ export default class LevelScene extends Scene {
         const player = new Hero(this, new Math.Vector2(f1.getCurrentRoom().rect.centerX, f1.getCurrentRoom().rect.centerY));
         player.addToDisplayList();
         player.addToUpdateList();
-        (window as any).hero = player;
+        
+        this.physics.add.collider(player, f1.tilemap.getLayer(0).tilemapLayer);
 
-        const jelly = new GameObjects.Sprite(this, f1.getCurrentRoom().rect.centerX + 48, f1.getCurrentRoom().rect.centerY + 24, "actors/jelly");
-        jelly.addToDisplayList();
+        const spawnArea = Geom.Rectangle.CopyFrom( f1.getCurrentRoom().rect , new Geom.Rectangle());
+        spawnArea.x += 120;
+        spawnArea.y += 96;
+        spawnArea.width -= 240;
+        spawnArea.height -= 192;
+        for (let i = 0; i < 80; ++ i) {
+            const point = spawnArea.getRandomPoint();
+            const jelly = new Enemy(this, new Math.Vector2(point.x, point.y), new Jelly());
+            jelly.addToDisplayList();
+        }
 
-        const jelly_king = new GameObjects.Sprite(this, f1.getCurrentRoom().rect.centerX + 96, f1.getCurrentRoom().rect.centerY + 18, "actors/jelly_king");
-        jelly_king.addToDisplayList();
+        const point = spawnArea.getRandomPoint();
+        const jellyKing = new Enemy(this, new Math.Vector2(point.x, point.y), new JellyKing());
+        jellyKing.addToDisplayList();
+
+        // const jelly = new GameObjects.Sprite(this, f1.getCurrentRoom().rect.centerX + 48, f1.getCurrentRoom().rect.centerY + 24, "actors/jelly");
+        // jelly.addToDisplayList();
+
+        // const jelly_king = new GameObjects.Sprite(this, f1.getCurrentRoom().rect.centerX + 96, f1.getCurrentRoom().rect.centerY + 18, "actors/jelly_king");
+        // jelly_king.addToDisplayList();
 
         // setInterval(() => new Flicker(player), 3000);
 
-        this.physics.add.collider(player, f1.tilemap.getLayer(0).tilemapLayer);
+        
 
     }
 

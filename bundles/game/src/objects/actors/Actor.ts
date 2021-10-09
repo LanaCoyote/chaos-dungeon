@@ -14,6 +14,8 @@ export default abstract class Actor extends GameObjects.Sprite implements Refere
     public readonly key: Symbol;
     public readonly id: Symbol;
 
+    public baseDepth: number = 0;
+
     private controllers: Map<Symbol, Controller>;
     private updateControllers: Map<Symbol, UpdateController>;
 
@@ -118,6 +120,10 @@ export default abstract class Actor extends GameObjects.Sprite implements Refere
 
     public hasController(key: Symbol): boolean {
         return this.controllers.has(key);
+    }
+
+    public setBaseDepth(newDepth: number) {
+        this.baseDepth = newDepth;
     }
 
     public toString(): string {

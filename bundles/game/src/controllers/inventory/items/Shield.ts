@@ -36,7 +36,6 @@ export default class Shield extends PointerItemData {
             targets: this,
             shoveDistance: 16,
             duration: 50,
-            ease: "Bounce",
             yoyo: true
         });
     }

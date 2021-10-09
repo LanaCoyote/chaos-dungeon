@@ -3,7 +3,7 @@ import { Math as Vector, Scene } from "phaser";
 import Equipment from "../../../objects/actors/Equipment";
 import ItemData from "./ItemData";
 
-export default class PointerItemData extends ItemData {
+export default abstract class PointerItemData extends ItemData {
 
     public aimVector: Vector.Vector2;
     public yOffset: number = 0;
@@ -27,7 +27,7 @@ export default class PointerItemData extends ItemData {
         equip.setPosition(targetPosition.x, targetPosition.y + this.yOffset);
 
         if (this.aimVector.y > 0 && distance > 8) {
-            equip.setDepth( equip.user.depth + 1 );
+            equip.setDepth( equip.user.depth + 24 + distance );
         } else {
             equip.setDepth( equip.user.depth - 1 );
         }
@@ -40,7 +40,7 @@ export default class PointerItemData extends ItemData {
         equip.setPosition(targetPosition.x, targetPosition.y + this.yOffset);
 
         if (this.aimVector.y > 0 && distance > 12) {
-            equip.setDepth( equip.user.depth + 1 );
+            equip.setDepth( equip.user.depth + 24 + distance );
         } else {
             equip.setDepth( equip.user.depth - 1 );
         }

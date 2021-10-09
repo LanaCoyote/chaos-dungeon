@@ -1,7 +1,7 @@
 export const EVENTS = {
-    TAKE_DAMAGE: Symbol("[Event TakeDamage]"),  // take x damage of the given type (damage, type, source, fromEnemy)
+    TAKE_DAMAGE: Symbol("[Event TakeDamage]"),  // take x damage of the given type (damage, type)
     HEAL_DAMAGE: Symbol("[Event HealDamage]"),  // recover x damage (damage)
-    KILL: Symbol("[Event Kill]"),   // immediately take lethal damage, resets the player (type, source, fromEnemy)
+    KILL: Symbol("[Event Kill]"),   // immediately take lethal damage, resets the player (type)
 }
 
 export enum DAMAGETYPES {
