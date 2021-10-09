@@ -1,12 +1,12 @@
 import { Math as Vector } from "phaser";
 
-import ItemData from "./ItemData";
+import PointerItemData from "./PointerItemData";
 import { ITEMCLASS } from "../constants";
 import Equipment from "../../../objects/actors/Equipment";
 import { EVENTS as MOVEMENT_EVENTS } from "../../physics/MovementController";
-import Flicker from "../../../effects/Flicker";
+import Flash from "../../../effects/Flash";
 
-export default class Sword extends ItemData {
+export default class Sword extends PointerItemData {
 
     public class = ITEMCLASS.SWORD;
     public texture = "item/sword";
@@ -16,7 +16,11 @@ export default class Sword extends ItemData {
     public slashing: Boolean;
     public powerAttacking: Boolean;
     public aborted: Boolean;
-    public aimVector: Vector.Vector2;
+    public target: Vector.Vector2;
+
+    private quickspinAxisVertical: Boolean;
+    private quickspinFrames = [0,0,0,0];
+    private quickspinThreshold: number = 2;
  
     public canUseAnotherItem(equip: Equipment) {
         if (this.slashing || this.powerAttacking || (!this.aborted && equip.holding)) {
@@ -42,18 +46,21 @@ export default class Sword extends ItemData {
     public putAway(equip: Equipment) {
         equip.setVisible(false);
         this.slashDistance = 1;
+        this.quickspinFrames = [0,0,0,0];
         this.aborted = false;
         equip.body.reset(equip.user.x, equip.user.y);
+        equip.user.emit( MOVEMENT_EVENTS.UNSLOW );
     }
 
     public startPowerAttack(equip: Equipment) {
         this.powerAttacking = true;
 
+        equip.user.emit( MOVEMENT_EVENTS.FREEZE, 500 );
         equip.scene.tweens.add({
             targets: equip,
-            angle: equip.angle - 450,
-            duration: 750,
-            ease: 'Linear',
+            angle: equip.angle - 540,
+            duration: 500,
+            ease: 'Sine',
             onComplete: () => this.donePowerAttak(equip)
         });
     }
@@ -64,17 +71,41 @@ export default class Sword extends ItemData {
 
     public onHold(equip: Equipment, delta: number) {
         if (!this.slashing && !this.powerAttacking && !this.aborted) {
+            if (this.chargeTime < 1000) {
+                const playerPosition = new Vector.Vector2( equip.user.x, equip.user.y );
+                const quickspinComparison = PointerItemData.getMousePosition( equip.scene ).subtract( playerPosition ).normalize();
+                if ( Math.abs( quickspinComparison.y ) > Math.abs( quickspinComparison.x ) ) {
+                    if ( quickspinComparison.y < 0 ) {
+                        this.quickspinFrames[0]++;
+                    } else {
+                        this.quickspinFrames[2]++;
+                    }
+                } else {
+                    if ( quickspinComparison.x < 0 ) {
+                        this.quickspinFrames[1]++;
+                    } else {
+                        this.quickspinFrames[3]++;
+                    }
+                }
+
+                if ( this.quickspinFrames.filter( frames => frames > this.quickspinThreshold ).length === 4 ) {
+                    delta = 1000;
+                    console.log("quickspin triggered!");
+                }
+            }
+
             if (this.chargeTime < 1000 && this.chargeTime + delta > 1000) {
-                new Flicker(equip, 100);
-                new Flicker(equip.user, 100);
+                new Flash(equip, 100);
+                new Flash(equip.user, 100);
             }
 
             this.chargeTime += delta;
+
+            
         }
     }
 
     public onRelease(equip: Equipment) {
-        console.log(this.slashing, this.powerAttacking);
         if (!this.slashing && !this.powerAttacking) {
             if (this.chargeTime < 1000) {
                 this.putAway(equip);
@@ -87,8 +118,8 @@ export default class Sword extends ItemData {
     }
 
     public onShoot(equip: Equipment) {
-        console.log(this.slashing, this.powerAttacking);
         if (!this.slashing && !this.powerAttacking) {
+            equip.user.emit( MOVEMENT_EVENTS.SLOW, 48 );
             this.slashTime = 200;
             this.chargeTime = 0;
             this.slashing = true;
@@ -100,6 +131,9 @@ export default class Sword extends ItemData {
                 duration: 50,
                 ease: "Sine"
             });
+
+            const qspinTarget = PointerItemData.getMousePosition( equip.scene );
+            this.quickspinAxisVertical = Math.abs( qspinTarget.y ) > Math.abs( qspinTarget.x );
         }
     }
 
@@ -114,37 +148,11 @@ export default class Sword extends ItemData {
 
     public onUpdate(equip: Equipment, delta: number) {
         if (this.powerAttacking) {
-            const sine = Math.sin( equip.angle * ( Math.PI / 180 ) );
-            const cosine = Math.cos( equip.angle * ( Math.PI / 180 ) );
-            const targetPos = new Vector.Vector2(
-                equip.user.x + sine * 24,
-                equip.user.y + cosine * -24
-            );
-
-            equip.setPosition( targetPos.x, targetPos.y );
-            equip.body.setVelocity( cosine * -24, sine * -24 );
-
-            if ( sine < 0 ) {
-                equip.setDepth( equip.user.depth + 1 );
-            } else {
-                equip.setDepth( equip.user.depth - 1 );
-            }
-        } else if (this.slashing || (!this.aborted && equip.holding)) {
-            const mousePos = new Vector.Vector2( equip.scene.input.activePointer.x, equip.scene.input.activePointer.y );
-            const screenPos = new Vector.Vector2( equip.scene.cameras.main.worldView.x, equip.scene.cameras.main.worldView.y );
-            const playerPos = new Vector.Vector2( equip.user.x, equip.user.y );
-            this.aimVector = screenPos.add( mousePos ).subtract( playerPos );
-            const targetPos = playerPos.add( this.aimVector.setLength(this.slashDistance) );
-            
-            equip.setPosition( targetPos.x, targetPos.y );
-            equip.setAngle( this.aimVector.angle() * ( 180 / Math.PI ) + 90 );
+            this.setToAngle( equip, (equip.angle - 90) * ( Math.PI / 180 ), this.slashDistance );
             equip.body.setVelocity( this.aimVector.x, this.aimVector.y );
-
-            if (this.aimVector.y > 0 && this.slashDistance > 12) {
-                equip.setDepth( equip.user.depth + 1 );
-            } else {
-                equip.setDepth( equip.user.depth - 1 );
-            }
+        } else if (this.slashing || (!this.aborted && equip.holding)) {
+            this.faceTo( equip, PointerItemData.getMousePosition( equip.scene ), this.slashDistance, 90 );
+            equip.body.setVelocity( this.aimVector.x, this.aimVector.y );
         } else if (this.aborted) {
             equip.body.setVelocity(0);
             this.putAway(equip);

@@ -1,4 +1,4 @@
-import { Scene, Types, Geom, Math } from "phaser";
+import { Scene, Types, Geom, Math, GameObjects } from "phaser";
 
 import Floor from "./Floor";
 import Actor from "../../objects/actors/Actor";
@@ -26,8 +26,13 @@ export default class LevelScene extends Scene {
 
     public preload() {
         this.load.image("tilesets/placeholder_tiles", "tiles");
-        this.load.image("actors/hero", "bear");
+        this.load.image("actors/hero", "static/bear.png");
         this.load.image("actors/item/sword", "static/sword.png");
+        this.load.image("actors/item/shield", "static/shield.png");
+
+        this.load.image("actors/jelly", "static/jelly.png");
+        this.load.image("actors/jelly_king", "static/jelly_king.png")
+
         this.load.tilemapCSV("tilemaps/F1", "level/f1.csv");
         this.load.json("data/level", "level/data.json");
     }
@@ -59,6 +64,12 @@ export default class LevelScene extends Scene {
         player.addToDisplayList();
         player.addToUpdateList();
         (window as any).hero = player;
+
+        const jelly = new GameObjects.Sprite(this, f1.getCurrentRoom().rect.centerX + 48, f1.getCurrentRoom().rect.centerY + 24, "actors/jelly");
+        jelly.addToDisplayList();
+
+        const jelly_king = new GameObjects.Sprite(this, f1.getCurrentRoom().rect.centerX + 96, f1.getCurrentRoom().rect.centerY + 18, "actors/jelly_king");
+        jelly_king.addToDisplayList();
 
         // setInterval(() => new Flicker(player), 3000);
 

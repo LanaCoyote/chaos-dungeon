@@ -8,7 +8,7 @@ export default abstract class ItemData {
     public readonly class: ITEMCLASS;
     public readonly texture: string;
 
-    public canUseAnotherItem(equipActor: Equipment): boolean { return true }
+    public canUseAnotherItem(equipActor: Equipment, other: ItemData): boolean { return true }
     public onEquip(equipActor: Equipment) {}
     public onHold(equipActor: Equipment, delta: number) {}
     public onRelease(equipActor: Equipment) {}

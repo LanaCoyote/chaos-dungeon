@@ -39,6 +39,12 @@ function getBundleTasks() {
                         },
                         output: {
                             minifyInternalExports: true
+                        },
+                        onwarn: warning => {
+                            // ignored warnings
+                            if (warning.code === "THIS_IS_UNDEFINED") return;
+                            if (warning.code === "UNRESOLVED_IMPORT") return;
+                            console.warn(`WARNING ${warning.code}: ${warning.message}`);
                         }
                     })
                     .pipe(vSrc(`build/${bundlePath}/index.js`))

@@ -92,9 +92,14 @@ export default class KbmInputController extends Controller implements UpdateCont
     public updateInventoryControls() {
         if (this.bindStates.shoot1 && !this.lastBindStates.shoot1) {
             this.attached.emit( INVENTORY_EVENTS.SHOOT_EQUIP, 1 );
-            console.log("trying to shoot");
         } else if (!this.bindStates.shoot1 && this.lastBindStates.shoot1) {
             this.attached.emit( INVENTORY_EVENTS.RELEASE_EQUIP, 1 );
+        }
+
+        if (this.bindStates.shoot2 && !this.lastBindStates.shoot2) {
+            this.attached.emit( INVENTORY_EVENTS.SHOOT_EQUIP, 2 );
+        } else if (!this.bindStates.shoot2 && this.lastBindStates.shoot2) {
+            this.attached.emit( INVENTORY_EVENTS.RELEASE_EQUIP, 2 );
         }
     }
 

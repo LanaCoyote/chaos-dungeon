@@ -19,5 +19,6 @@ export enum MOVESTATE {
     STOPPING,
     WALKING,
     RUNNING,
-    IMPULSE
+    IMPULSE,
+    FROZEN
 };

@@ -7,7 +7,11 @@ import { MOVESTATE } from "../../constants";
 
 export const EVENTS = {
     MOVE: Symbol("[Event Move]"),
-    SHOVE: Symbol("[Event Shove]")
+    SHOVE: Symbol("[Event Shove]"),
+    FREEZE: Symbol("[Event Freeze]"),
+    UNFREEZE: Symbol("[Event Unfreeze]"),
+    SLOW: Symbol("[Event Slow]"),
+    UNSLOW: Symbol("[Event Unslow]")
 }
 
 export default class MovementController extends ArcadePhysicsController implements UpdateController {
@@ -17,6 +21,7 @@ export default class MovementController extends ArcadePhysicsController implemen
     public intentWeight: number = 10;
     public mass: number = 1;
     public maxSpeed: number = 120;
+    public currentMaxSpeed: number;
 
     private intents: Array<Math.Vector2> = [];
     private impulse: Math.Vector2;
@@ -25,8 +30,13 @@ export default class MovementController extends ArcadePhysicsController implemen
     constructor(actor?: Actor, scene?: Scene) {
         super(actor, scene);
 
+        this.currentMaxSpeed = this.maxSpeed;
         this.on(EVENTS.MOVE, (velocity: Math.Vector2) => this.move(velocity));
         this.on(EVENTS.SHOVE, (velocity: Math.Vector2) => this.shove(velocity));
+        this.on(EVENTS.FREEZE, (duration: number) => this.freeze(duration));
+        this.on(EVENTS.UNFREEZE, () => this.unfreeze());
+        this.on(EVENTS.SLOW, (speed: number) => this.slow(speed));
+        this.on(EVENTS.UNSLOW, () => this.unslow());
     }
 
     public attach(actor: Actor, scene?: Scene) {
@@ -37,16 +47,26 @@ export default class MovementController extends ArcadePhysicsController implemen
     public activate() {
         this.active = true;
         this.body.setEnable(true);
+        this.unfreeze();
     }
 
     public deactivate() {
         this.active = false;
+        this.unslow();
         this.body.setVelocity(0, 0);
         this.body.setEnable(false);
     }
 
     public hasUpdateMethod(): true {
         return true;
+    }
+
+    public freeze(duration?: number) {
+        this.state = MOVESTATE.FROZEN;
+
+        if (duration) {
+            setTimeout(() => this.unfreeze(), duration);
+        }
     }
 
     public move(velocity: Math.Vector2) {
@@ -59,6 +79,20 @@ export default class MovementController extends ArcadePhysicsController implemen
         } else {
             this.impulse = this.impulse.add(velocity);
         }
+    }
+
+    public slow(newSpeed: number) {
+        this.currentMaxSpeed = newSpeed;
+    }
+
+    public unfreeze() {
+        if (this.state === MOVESTATE.FROZEN) {
+            this.state = MOVESTATE.STOPPING;
+        }
+    }
+
+    public unslow() {
+        this.currentMaxSpeed = this.maxSpeed;
     }
 
     public update(time: number, delta: number) {
@@ -79,6 +113,13 @@ export default class MovementController extends ArcadePhysicsController implemen
         if (this.state === MOVESTATE.IMPULSE) {
             if (this.body.velocity.lengthSq() < this.maxSpeed * this.maxSpeed) {
                 this.state = MOVESTATE.STOPPING;
+            } else {
+                this.body.setAcceleration(-this.body.velocity.x * this.decelRate, -this.body.velocity.y * this.decelRate);
+            }
+        } else if (this.state === MOVESTATE.FROZEN) {
+            if (this.body.velocity.lengthSq() < 8) {
+                this.body.setVelocity( 0, 0 );
+                this.body.setAcceleration( 0, 0 );
             } else {
                 this.body.setAcceleration(-this.body.velocity.x * this.decelRate, -this.body.velocity.y * this.decelRate);
             }
@@ -110,9 +151,9 @@ export default class MovementController extends ArcadePhysicsController implemen
                 this.body.setAcceleration(newAcceleration.x, newAcceleration.y);
 
                 // cap movement speed
-                if (this.body.velocity.lengthSq() > this.maxSpeed * this.maxSpeed) {
-                    this.state = MOVESTATE.RUNNING;
-                    this.body.velocity.setLength(this.maxSpeed);
+                if (this.body.velocity.lengthSq() > this.currentMaxSpeed * this.currentMaxSpeed) {
+                    if (this.currentMaxSpeed >= this.maxSpeed) this.state = MOVESTATE.RUNNING;
+                    this.body.velocity.setLength(this.currentMaxSpeed);
                 }
             } else {
                 this.state = MOVESTATE.STOPPING;
