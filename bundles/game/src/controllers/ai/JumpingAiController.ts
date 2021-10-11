@@ -57,6 +57,7 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
             case JumpingEnemyStates.JUMPING :
                 if (!jumpDestination) jumpDestination = this.determineWhereToJump( jumpDestination );
                 this.scene.time.delayedCall( this.data.timeBeforeJump, () => {
+                    if (!this.attached) return;
                     if (jumpDestination) {
                         this.jump( jumpDestination );
                         this.data.onJump(this);
@@ -133,6 +134,7 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
             duration: this.data.jumpDuration / 2,
             ease: 'Sine',
             onComplete: () => {
+                if (!this.attached) return;
                 this.attached.emit( MOVEMENT_EVENTS.SHOVE, new Vector.Vector2( xMovement, this.data.jumpHeight ) );
 
                 this.scene.tweens.add({
@@ -141,6 +143,7 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
                     duration: this.data.jumpDuration / 2,
                     ease: 'Bounce',
                     onComplete: () => {
+                        if (!this.attached) return;
                         this.attached.setBaseDepth( DEPTH_FLOOR );
                     }
                 });

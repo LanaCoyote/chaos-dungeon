@@ -49,6 +49,8 @@ export default class Sword extends PointerItemData {
         this.quickspinFrames = [0,0,0,0];
         this.aborted = false;
         equip.body.reset(equip.user.x, equip.user.y);
+        equip.body.setEnable(false);
+        equip.body.debugBodyColor = 0x0;
         equip.user.emit( MOVEMENT_EVENTS.UNSLOW );
     }
 
@@ -124,6 +126,8 @@ export default class Sword extends PointerItemData {
             this.chargeTime = 0;
             this.slashing = true;
 
+            equip.body.setEnable(true);
+            equip.body.debugBodyColor = 0x00ff00;
             equip.setVisible(true);
             equip.scene.tweens.add({
                 targets: this,

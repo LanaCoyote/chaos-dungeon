@@ -43,7 +43,7 @@ export default abstract class Actor extends GameObjects.Sprite implements Refere
         }
     }
 
-    constructor(scene: Scene, origin: Math.Vector2, texture: string, frame?: string|number) {
+    constructor(scene: Scene, origin: Math.Vector2, texture: string, frame?: string|number, id?: Symbol) {
         super(scene, origin.x, origin.y, `actors/${texture}`, frame);
 
         this.key = Symbol.for(this.toString());
@@ -75,6 +75,12 @@ export default abstract class Actor extends GameObjects.Sprite implements Refere
 
     public deactivateAllControllers() {
         this.controllers.forEach(ctrl => ctrl.deactivate());
+    }
+
+    public destroyAllControllers() {
+        this.controllers.forEach(ctrl => ctrl.destroy());
+        this.controllers.clear();
+        this.removeAllListeners();
     }
 
     public reactivateAllControllers() {

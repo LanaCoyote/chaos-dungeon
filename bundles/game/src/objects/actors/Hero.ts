@@ -2,6 +2,7 @@ import { Math as Vectors, Scene, GameObjects, Physics, BlendModes } from "phaser
 
 import { DEPTH_FLOOR } from "../../constants";
 import Actor from "./Actor";
+import TestDamageReceiver from "../../controllers/damage/TestDamageReceiver";
 import InventoryController from "../../controllers/inventory/InventoryController";
 import MovementController from "../../controllers/physics/MovementController";
 import KbmInputController from "../../controllers/player/KbmInputController";
@@ -12,6 +13,7 @@ export default class Hero extends Actor {
     public static activeHero: Hero;
 
     public body: Physics.Arcade.Body;
+    public damage: TestDamageReceiver;
 
     constructor(scene: Scene, origin: Vectors.Vector2) {
         super(scene, origin, "hero");
@@ -21,6 +23,10 @@ export default class Hero extends Actor {
         movementController.maxSpeed = 180;
         movementController.intentWeight = 25;
         movementController.activate();
+
+        const damageController = new TestDamageReceiver(this);
+        damageController.invulnPeriod = 1000;
+        damageController.activate();
 
         const inventoryController = new InventoryController(this);
         inventoryController.activate();
@@ -35,6 +41,7 @@ export default class Hero extends Actor {
 
         // players use 24x36 sprites but occupy a 9u ellipse
         this.body.setCircle(6, (this.width - 12) / 2, this.height - 13);
+        this.body.onOverlap = true;
 
         this.on( GameObjects.Events.ADDED_TO_SCENE, () => {
             this.setBaseDepth( DEPTH_FLOOR + 2 );

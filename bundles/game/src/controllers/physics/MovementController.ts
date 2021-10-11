@@ -53,8 +53,10 @@ export default class MovementController extends ArcadePhysicsController implemen
     public deactivate() {
         this.active = false;
         this.unslow();
-        this.body.setVelocity(0, 0);
-        this.body.setEnable(false);
+        if (this.body) {
+            this.body.setVelocity(0, 0);
+            this.body.setEnable(false);
+        }
     }
 
     public hasUpdateMethod(): true {

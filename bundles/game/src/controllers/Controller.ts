@@ -33,7 +33,7 @@ export default abstract class Controller {
     private listeners: Map<ControllerEventName, ControllerEventCb>;
 
     public readonly key: Symbol;
-    public active: Boolean;
+    public active: boolean;
     public attached: Attachable;
     public scene: Scene;
 
@@ -113,9 +113,7 @@ export default abstract class Controller {
             return console.error("%s requested more than one listener for %s", this, event);
         }
 
-        if (!always) {
-            cb = this.wrapCb(cb);
-        }
+        cb = this.wrapCb(cb, event, always);
 
         if (this.isAttached()) {
             this.attached.on(event, cb, this);
@@ -152,10 +150,20 @@ export default abstract class Controller {
         return `[Controller ${this.constructor.name} ${attachmentString}]`;
     }
 
-    private wrapCb(cb: ControllerEventCb): ControllerEventCb {
+    private wrapCb(cb: ControllerEventCb, eventName: ControllerEventName, always: boolean): ControllerEventCb {
         return (...args) => {
-            if (this.active) {
-                cb(...args);
+            if (!this) {
+                console.error(`Intercepted Controller Event (${eventName.toString()}) bound for undefined!`);
+            } else if (!this.attached) {
+                console.error(`Intercepted Controller Event (${eventName.toString()}) from dead attachment!`);
+            }
+
+            try {
+                if (always || this.active) {
+                    cb(...args);
+                }
+            } catch (err) {
+                console.error(`Error when resolving Controller Event (${eventName.toString()}):\n\t`, err);
             }
         }
     }

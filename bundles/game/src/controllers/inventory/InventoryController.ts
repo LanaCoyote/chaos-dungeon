@@ -10,7 +10,7 @@ import Equipment from "../../objects/actors/Equipment";
 export default class InventoryController extends Controller {
 
     private static InventoryState: Map<ITEMCLASS, ItemData> = new Map();
-    private static EquippedItems: Array<Equipment> = [];
+    public static EquippedItems: Array<Equipment> = [];
 
     constructor( attached?: Actor ) {
         super(attached);

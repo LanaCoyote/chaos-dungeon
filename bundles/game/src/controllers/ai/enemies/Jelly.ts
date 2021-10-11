@@ -41,6 +41,7 @@ export default class Jelly extends EnemyData implements JumpingEnemyDataType {
             repeat: 2,
             ease: 'bounce',
             onComplete: () => {
+                if (!ai.attached) return;
                 ai.attached.displayHeight = this.initialHeight;
             }
         });
@@ -55,6 +56,7 @@ export default class Jelly extends EnemyData implements JumpingEnemyDataType {
             repeat: 3,
             ease: 'bounce',
             onComplete: () => {
+                if (!ai.attached) return;
                 ai.attached.displayHeight = this.initialHeight;
             }
         });
@@ -68,6 +70,7 @@ export default class Jelly extends EnemyData implements JumpingEnemyDataType {
             yoyo: true,
             ease: 'Sine',
             onComplete: () => {
+                if (!ai.attached) return;
                 ai.attached.displayHeight = this.initialHeight;
             }
         });

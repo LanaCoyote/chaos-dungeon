@@ -1,7 +1,13 @@
 export const EVENTS = {
-    TAKE_DAMAGE: Symbol("[Event TakeDamage]"),  // take x damage of the given type (damage, type)
+    TAKE_DAMAGE: Symbol("[Event TakeDamage]"),  // take x damage of the given type (damage, type, source, attacker)
     HEAL_DAMAGE: Symbol("[Event HealDamage]"),  // recover x damage (damage)
-    KILL: Symbol("[Event Kill]"),   // immediately take lethal damage, resets the player (type)
+    KILL: Symbol("[Event Kill]"),               // immediately take lethal damage, resets the player (type, source, attacker)
+
+    DIED: Symbol("[Event Died]"),               // fires when an actor runs out of life (damageTaken, type, attacker)
+
+    START_VOIDOUT: Symbol("[Event Start VoidOut]"), // fires at the beginning of a void out (damageTaken, type, attacker)
+    VOIDOUT: Symbol("[Event VoidOut]"),         // fires after the fade out effect of a void out but before the fade in (damageTaken, type, attacker)
+    END_VOIDOUT: Symbol("[Event End VoidOut]"), // fires after the fade in effect of a void out (damageTaken, type, attacker)
 }
 
 export enum DAMAGETYPES {

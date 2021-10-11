@@ -29,7 +29,7 @@ export default class Flicker {
 
             this.mode = !this.mode;
         } else {
-            const color = Math.random() * 0xffffff;
+            const color = Math.random() * 0x00ffff + 0xff0000;
             this.target.setTintFill(color);
         }
     }

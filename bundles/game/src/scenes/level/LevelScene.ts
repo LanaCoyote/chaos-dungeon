@@ -1,4 +1,4 @@
-import { Scene, Types, Geom, Math, GameObjects } from "phaser";
+import { Scene, Types, Geom, Math as Vector, GameObjects } from "phaser";
 
 import Floor from "./Floor";
 import Actor from "../../objects/actors/Actor";
@@ -6,7 +6,9 @@ import Hero from "../../objects/actors/Hero";
 import Enemy from "../../objects/actors/Enemy";
 import Jelly from "../../controllers/ai/enemies/Jelly";
 import JellyKing from "../../controllers/ai/enemies/JellyKing";
-import Flicker from "../../effects/Flicker";
+import InventoryController from "../../controllers/inventory/InventoryController";
+import Curtain from "../../effects/Curtain";
+import { EVENTS as DAMAGE_EVENTS } from "../../controllers/damage/constants";
 
 import { SCREEN_HEIGHT, SCREEN_HEIGHT_ABS, SCREEN_WIDTH_ABS, TILE_HEIGHT, TILE_WIDTH } from "../../constants";
 
@@ -34,7 +36,9 @@ export default class LevelScene extends Scene {
         this.load.image("actors/item/shield", "static/shield.png");
 
         this.load.image("actors/enemy/jelly", "static/jelly.png");
-        this.load.image("actors/enemy/jelly_king", "static/jelly_king.png")
+        this.load.image("actors/enemy/jelly_king", "static/jelly_king.png");
+
+        this.load.spritesheet('vfx/dustcloud', 'static/dustcloud.png', {frameWidth: 24});
 
         this.load.tilemapCSV("tilemaps/F1", "level/f1.csv");
         this.load.json("data/level", "level/data.json");
@@ -63,26 +67,31 @@ export default class LevelScene extends Scene {
 
         this.floors[0].activate();
 
-        const player = new Hero(this, new Math.Vector2(f1.getCurrentRoom().rect.centerX, f1.getCurrentRoom().rect.centerY));
+        const player = new Hero(this, new Vector.Vector2(f1.getCurrentRoom().rect.centerX, f1.getCurrentRoom().rect.bottom - TILE_HEIGHT));
         player.addToDisplayList();
         player.addToUpdateList();
         
         this.physics.add.collider(player, f1.tilemap.getLayer(0).tilemapLayer);
 
         const spawnArea = Geom.Rectangle.CopyFrom( f1.getCurrentRoom().rect , new Geom.Rectangle());
+        const jellies: Enemy<any>[] = [];
         spawnArea.x += 120;
         spawnArea.y += 96;
         spawnArea.width -= 240;
         spawnArea.height -= 192;
-        for (let i = 0; i < 8; ++ i) {
+        for (let i = 0; i < 16; ++ i) {
             const point = spawnArea.getRandomPoint();
-            const jelly = new Enemy(this, new Math.Vector2(point.x, point.y), new Jelly());
+            const jelly = new Enemy(this, new Vector.Vector2(point.x, point.y), new Jelly());
             jelly.addToDisplayList();
+            jellies.push(jelly);
+            const sword = InventoryController.EquippedItems[0];
+            this.physics.add.overlap(sword, jelly);
+            this.physics.add.overlap(jelly, player);
         }
 
-        const point = spawnArea.getRandomPoint();
-        const jellyKing = new Enemy(this, new Math.Vector2(point.x, point.y), new JellyKing());
-        jellyKing.addToDisplayList();
+        // const point = spawnArea.getRandomPoint();
+        // const jellyKing = new Enemy(this, new Vector.Vector2(point.x, point.y), new JellyKing());
+        // jellyKing.addToDisplayList();
 
         // const jelly = new GameObjects.Sprite(this, f1.getCurrentRoom().rect.centerX + 48, f1.getCurrentRoom().rect.centerY + 24, "actors/jelly");
         // jelly.addToDisplayList();
@@ -90,10 +99,19 @@ export default class LevelScene extends Scene {
         // const jelly_king = new GameObjects.Sprite(this, f1.getCurrentRoom().rect.centerX + 96, f1.getCurrentRoom().rect.centerY + 18, "actors/jelly_king");
         // jelly_king.addToDisplayList();
 
-        // setInterval(() => new Flicker(player), 3000);
+        new Curtain(this, player, undefined, 2500, false).fadeIn();
 
-        
+        // setInterval(() => {
+        //     const index = Math.floor(Math.random() * jellies.length);
+        //     console.log(index);
+        //     if (index >= jellies.length) return;
+        //     console.log(jellies[index]);
+        //     jellies[index].emit(DAMAGE_EVENTS.TAKE_DAMAGE, 1000, 1, player);
+        // }, 1000);
 
+        setTimeout(() => {
+            f1.tilemap.putTilesAt([[1,1],[1,1]], 49, 39, true)
+        }, 2000)
     }
 
     public update(time: number, delta: number) {
