@@ -9,6 +9,7 @@ import Controller, { UpdateController } from "../../controllers/Controller";
 // TODO: implement controllers
 export default abstract class Actor extends GameObjects.Sprite implements Referenced {
 
+    public static actorContainer: GameObjects.Container;
     private static livingActors: Map<Symbol, Map<Symbol, Actor>> = new Map();
     
     public readonly key: Symbol;
@@ -34,6 +35,12 @@ export default abstract class Actor extends GameObjects.Sprite implements Refere
     }
 
     private static registerActor(newActor: Actor) {
+        if (!Actor.actorContainer) {
+            Actor.actorContainer = newActor.scene.add.container(0, 0, newActor);
+        } else {
+            Actor.actorContainer.add(newActor);
+        }
+
         if (!Actor.livingActors.has(newActor.key)) {
             const classMap = new Map();
             classMap.set(newActor.id, newActor);

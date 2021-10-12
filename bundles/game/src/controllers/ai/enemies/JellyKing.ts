@@ -5,6 +5,11 @@ export default class JellyKing extends Jelly {
 
     public texture = "enemy/jelly_king";
 
+    life: number = 4;
+    
+    damageOnTouch: boolean = true;
+    touchDamageAmount: number = 1;
+
     timeBeforeJump: number = 300;     // how long to wait before jumping when deciding to jump
     jumpHeight: number = 96;         // how high the enemy jumps, in pixels
     jumpDistance: number = 144;       // how far the enemy jumps, in pixels

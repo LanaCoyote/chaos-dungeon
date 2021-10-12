@@ -10,6 +10,11 @@ export default class Jelly extends EnemyData implements JumpingEnemyDataType {
 
     public texture = "enemy/jelly";
 
+    life: number = 2;
+    
+    damageOnTouch: boolean = true;
+    touchDamageAmount: number = 1;
+
     timeBeforeJump: number = 500;     // how long to wait before jumping when deciding to jump
     jumpHeight: number = 64;         // how high the enemy jumps, in pixels
     jumpDistance: number = 120;       // how far the enemy jumps, in pixels
@@ -33,6 +38,8 @@ export default class Jelly extends EnemyData implements JumpingEnemyDataType {
     }
 
     public onSleep( ai: JumpingAiController ) {
+        if (!ai.active) return;
+
         ai.scene.tweens.add({
             targets: ai.attached,
             displayHeight: this.squishHeight,
@@ -48,6 +55,8 @@ export default class Jelly extends EnemyData implements JumpingEnemyDataType {
     }
 
     public onDecideToJump( ai: JumpingAiController ) {
+        if (!ai.active) return;
+
         ai.scene.tweens.add({
             targets: ai.attached,
             displayHeight: this.squishHeight,
@@ -63,6 +72,8 @@ export default class Jelly extends EnemyData implements JumpingEnemyDataType {
     }
 
     public onJump( ai: JumpingAiController ) {
+        if (!ai.active) return;
+
         ai.scene.tweens.add({
             targets: ai.attached,
             displayHeight: this.stretchHeight,

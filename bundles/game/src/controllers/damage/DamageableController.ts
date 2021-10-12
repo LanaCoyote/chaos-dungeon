@@ -30,7 +30,7 @@ export default abstract class DamageableController extends Controller {
     }
 
     public takeDamage(amount: number, type: DAMAGETYPES, source: Actor, attacker?: Actor): number {
-        if (this.isInvulnerable() || !this.active || !this) return 0;
+        if (!this || !this.active || this.isInvulnerable() || type === DAMAGETYPES.NONE) return 0;
 
         if (this.shouldTakeDamage(amount, type, source, attacker)) {
             amount = this.adjustDamage(amount, type, source, attacker);

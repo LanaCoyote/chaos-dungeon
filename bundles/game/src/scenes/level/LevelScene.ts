@@ -8,6 +8,7 @@ import Jelly from "../../controllers/ai/enemies/Jelly";
 import JellyKing from "../../controllers/ai/enemies/JellyKing";
 import InventoryController from "../../controllers/inventory/InventoryController";
 import Curtain from "../../effects/Curtain";
+import UICamera from "../../objects/ui/UICamera";
 import { EVENTS as DAMAGE_EVENTS } from "../../controllers/damage/constants";
 
 import { SCREEN_HEIGHT, SCREEN_HEIGHT_ABS, SCREEN_WIDTH_ABS, TILE_HEIGHT, TILE_WIDTH } from "../../constants";
@@ -73,19 +74,23 @@ export default class LevelScene extends Scene {
         
         this.physics.add.collider(player, f1.tilemap.getLayer(0).tilemapLayer);
 
+        const sword = InventoryController.EquippedItems[0];
+        const shield = InventoryController.EquippedItems[1];
+
         const spawnArea = Geom.Rectangle.CopyFrom( f1.getCurrentRoom().rect , new Geom.Rectangle());
         const jellies: Enemy<any>[] = [];
         spawnArea.x += 120;
         spawnArea.y += 96;
         spawnArea.width -= 240;
         spawnArea.height -= 192;
-        for (let i = 0; i < 16; ++ i) {
+        for (let i = 0; i < 3; ++ i) {
             const point = spawnArea.getRandomPoint();
             const jelly = new Enemy(this, new Vector.Vector2(point.x, point.y), new Jelly());
             jelly.addToDisplayList();
             jellies.push(jelly);
-            const sword = InventoryController.EquippedItems[0];
+            
             this.physics.add.overlap(sword, jelly);
+            this.physics.add.overlap(shield, jelly);
             this.physics.add.overlap(jelly, player);
         }
 
@@ -100,6 +105,19 @@ export default class LevelScene extends Scene {
         // jelly_king.addToDisplayList();
 
         new Curtain(this, player, undefined, 2500, false).fadeIn();
+
+        const ignored: GameObjects.GameObject[] = f1.tilemap.layers.map( layer => layer.tilemapLayer );
+        ignored.push( Actor.actorContainer );
+        const uiCamera = new UICamera();
+        this.cameras.addExisting( uiCamera );
+        uiCamera.ignore( ignored );
+
+        const debugText = this.make.text({
+            text: "---- LIFE ----",
+            x: TILE_WIDTH,
+            y: TILE_WIDTH
+        });
+        uiCamera.addToRenderList(debugText);
 
         // setInterval(() => {
         //     const index = Math.floor(Math.random() * jellies.length);

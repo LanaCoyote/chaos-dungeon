@@ -1,7 +1,15 @@
 
 
 import { ITEMCLASS } from "../constants";
+import Actor from "../../../objects/actors/Actor";
 import Equipment from "../../../objects/actors/Equipment";
+import { DAMAGETYPES } from "../../damage/constants";
+
+export interface WeaponData {
+    getDamage: (equipActor: Equipment) => number;
+    getDamageType: (equipActor: Equipment) => DAMAGETYPES;
+    onDamage: (equipActor: Equipment, other: Actor) => void;
+}
 
 export default abstract class ItemData {
 

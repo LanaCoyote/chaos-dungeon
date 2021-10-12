@@ -117,6 +117,8 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
     }
 
     private jump( destination: Geom.Point ) {
+        if (!this.active) return;
+
         const xMovement = destination.x - this.attached.x;
         this.attached.setBaseDepth( DEPTH_FLYING );
         this.attached.emit( MOVEMENT_EVENTS.SHOVE, new Vector.Vector2( xMovement, this.data.jumpHeight * -1 ) );

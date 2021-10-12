@@ -6,3 +6,11 @@ export interface Referenced {
     readonly key: Symbol;
     readonly id: Symbol;
 }
+
+// Event emitters
+// I'm not sure if this is the extent of the interface
+export interface EventEmitter {
+    emit: (event: string|Symbol, ...params: any) => void;
+    on: (event: string|Symbol, callback: (...args: any)=>any, ...params: any) => void;
+    removeListener: (event: string|Symbol, cb: (...args: any)=>any, context?: any) => any;
+}

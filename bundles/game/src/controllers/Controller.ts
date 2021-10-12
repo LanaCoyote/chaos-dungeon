@@ -1,11 +1,11 @@
 import { Scene } from "phaser";
 
+import { Referenced, EventEmitter } from "../objects/types";
+
 export type ControllerEventName = string|symbol;
 export type ControllerEventCb = (...args: any) => any;
 
-export interface Attachable {
-    id: Symbol;
-    key: Symbol;
+export interface Attachable extends Referenced, EventEmitter {
     scene: Scene;
 
     attachController: (ctrl: Controller) => boolean;
@@ -13,10 +13,6 @@ export interface Attachable {
 
     getController: (key: Symbol|Controller) => Controller;
     hasController: (key: Symbol) => boolean;
-
-    emit: (event: ControllerEventName, ...params: any) => void; // todo: make this type safe
-    on: (event: ControllerEventName, cb: ControllerEventCb, context?: any) => any;
-    removeListener: (event: ControllerEventName, cb: ControllerEventCb, context?: any) => any;
 };
 
 export interface UpdateController {

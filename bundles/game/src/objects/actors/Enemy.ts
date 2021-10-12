@@ -4,6 +4,7 @@ import Actor from "./Actor";
 import AiController from "../../controllers/ai/AiController";
 import DamageableController from "../../controllers/damage/DamageableController";
 import TouchDamageEnemyController from "../../controllers/damage/TouchDamageDealerController";
+import DamageableEnemyController from "../../controllers/damage/DamageableEnemyController";
 import LifeController from "../../controllers/damage/LifeController";
 import EnemyData from "../../controllers/ai/enemies/EnemyData";
 import MovementController from "../../controllers/physics/MovementController";
@@ -15,7 +16,6 @@ export default class Enemy<AiControllerType> extends Actor {
     public ai: AiControllerType;
     public body: Physics.Arcade.Body;
     public damage: LifeController;
-    public damageDealer: TouchDamageEnemyController;
     public enemyData: EnemyData;
 
     constructor( scene: Scene, origin: Vector.Vector2, enemyData: EnemyData, texture?: string ) {
@@ -27,12 +27,8 @@ export default class Enemy<AiControllerType> extends Actor {
         
 
         const ai = enemyData.createController( this );
-        
 
-        this.damage = new LifeController(this, 2);
-        
-
-        this.damageDealer = new TouchDamageEnemyController(this);
+        this.damage = new DamageableEnemyController(this, enemyData);
         this.setVisible( false );
         
 
@@ -41,7 +37,6 @@ export default class Enemy<AiControllerType> extends Actor {
                 movementController.activate();
                 if (ai) ai.activate();
                 this.damage.activate();
-                this.damageDealer.activate();
                 this.setVisible(true);
             });
         })

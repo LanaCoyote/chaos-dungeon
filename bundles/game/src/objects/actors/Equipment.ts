@@ -2,7 +2,7 @@ import { Math as Vector, Physics, Scene } from "phaser";
 
 import Actor from "./Actor";
 import { ITEMCLASS } from "../../controllers/inventory/constants";
-import ItemData from "../../controllers/inventory/items/ItemData";
+import ItemData, { WeaponData } from "../../controllers/inventory/items/ItemData";
 import TouchDamageWeaponController from "../../controllers/damage/TouchDamageWeaponController";
 import LevelScene from "../../scenes/level/LevelScene";
 
@@ -41,7 +41,7 @@ export default class Equipment extends Actor {
         this.body.setImmovable(true);
         this.body.onOverlap = true;
 
-        this.damage = new TouchDamageWeaponController(this);
+        this.damage = new TouchDamageWeaponController(this, item as unknown as WeaponData); // bad
         this.damage.activate();
 
         // this.scene.physics.add.overlap(this, this.scene.getCurrentFloor().tilemap.getLayer(0).tilemapLayer, () => this.onTouch());

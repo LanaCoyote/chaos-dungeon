@@ -1,9 +1,13 @@
 import PointerItemData from "./PointerItemData";
+import { WeaponData } from "./ItemData"
 import { EVENTS, ITEMCLASS } from "../constants";
+import Actor from "../../../objects/actors/Actor";
 import Equipment from "../../../objects/actors/Equipment";
 import { EVENTS as MOVEMENT_EVENTS } from "../../physics/MovementController";
+import { DAMAGETYPES } from "../../damage/constants";
+import Flash from "../../../effects/Flash";
 
-export default class Shield extends PointerItemData {
+export default class Shield extends PointerItemData implements WeaponData {
 
     public class = ITEMCLASS.SHIELD;
     public texture = "item/shield";
@@ -22,9 +26,24 @@ export default class Shield extends PointerItemData {
         }
     }
 
+    public getDamage( equip: Equipment ): number {
+        return 1;
+    }
+
+    public getDamageType( equip: Equipment ): DAMAGETYPES {
+        if (this.parryTime <= 0) return DAMAGETYPES.NONE;
+
+        this.parried( equip );
+        return DAMAGETYPES.STUN;
+    }
+
     public putAway( equip: Equipment ) {
         equip.setVisible( false );
         equip.user.emit( MOVEMENT_EVENTS.UNSLOW );
+    }
+
+    public onDamage( equip: Equipment, other: Actor ) {
+        
     }
 
     public onShoot( equip: Equipment ) {
@@ -50,6 +69,11 @@ export default class Shield extends PointerItemData {
         if (this.parryTime > 0) {
             this.parryTime -= delta;
         }
+    }
+
+    public parried( equip: Equipment ) {
+        new Flash( equip, 100 );
+        new Flash( equip.user, 100 );
     }
 
 }

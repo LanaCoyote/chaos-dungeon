@@ -11,6 +11,7 @@ export const EVENTS = {
 }
 
 export enum DAMAGETYPES {
+    NONE,           // doesn't do damage
     STUN,           // stun damage dealt by the hookshot/boomerang, usually ignored unless weak
     PHYSICAL,       // damage done by most weapons, such as the bow and sword
     EXPLODE,        // bomb damage

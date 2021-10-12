@@ -11,6 +11,11 @@ export default abstract class EnemyData {
     public minimumStateTime: number = 1000;
     public maximumStateTime: number = 3000;
 
+    public life: number = 1;
+    public damageOnTouch: boolean = true;
+    public touchDamageAmount: number = 1;
+    public touchDamageType: DAMAGETYPES = DAMAGETYPES.PHYSICAL;
+
     public createController( attached: Actor ): AiController<EnemyData>|null {
         return null;
     }

@@ -1,12 +1,15 @@
 import { Math as Vector } from "phaser";
 
 import PointerItemData from "./PointerItemData";
+import { WeaponData } from "./ItemData";
 import { ITEMCLASS } from "../constants";
 import Equipment from "../../../objects/actors/Equipment";
 import { EVENTS as MOVEMENT_EVENTS } from "../../physics/MovementController";
 import Flash from "../../../effects/Flash";
+import { DAMAGETYPES } from "../../damage/constants";
+import Actor from "../../../objects/actors/Actor";
 
-export default class Sword extends PointerItemData {
+export default class Sword extends PointerItemData implements WeaponData {
 
     public class = ITEMCLASS.SWORD;
     public texture = "item/sword";
@@ -43,11 +46,19 @@ export default class Sword extends PointerItemData {
         this.putAway(equip);
     }
 
+    public getDamage( equip: Equipment ): number {
+        if (this.powerAttacking) return 2;
+        return 1;
+    }
+
+    public getDamageType( equip: Equipment ): DAMAGETYPES {
+        return DAMAGETYPES.PHYSICAL;
+    }
+
     public putAway(equip: Equipment) {
         equip.setVisible(false);
         this.slashDistance = 1;
         this.quickspinFrames = [0,0,0,0];
-        this.aborted = false;
         equip.body.reset(equip.user.x, equip.user.y);
         equip.body.setEnable(false);
         equip.body.debugBodyColor = 0x0;
@@ -72,7 +83,7 @@ export default class Sword extends PointerItemData {
     }
 
     public onHold(equip: Equipment, delta: number) {
-        if (!this.slashing && !this.powerAttacking && !this.aborted) {
+        if (!this.slashing && !this.powerAttacking && !this.aborted && equip.visible) {
             if (this.chargeTime < 1000) {
                 const playerPosition = new Vector.Vector2( equip.user.x, equip.user.y );
                 const quickspinComparison = PointerItemData.getMousePosition( equip.scene ).subtract( playerPosition ).normalize();
@@ -92,7 +103,6 @@ export default class Sword extends PointerItemData {
 
                 if ( this.quickspinFrames.filter( frames => frames > this.quickspinThreshold ).length === 4 ) {
                     delta = 1000;
-                    console.log("quickspin triggered!");
                 }
             }
 
@@ -125,6 +135,7 @@ export default class Sword extends PointerItemData {
             this.slashTime = 200;
             this.chargeTime = 0;
             this.slashing = true;
+            this.aborted = false;
 
             equip.body.setEnable(true);
             equip.body.debugBodyColor = 0x00ff00;
@@ -141,8 +152,17 @@ export default class Sword extends PointerItemData {
         }
     }
 
-    public onTouch(equip: Equipment) {
-        if (!this.slashing && equip.holding) {
+    // public onTouch(equip: Equipment) {
+    //     if (!this.slashing && equip.holding) {
+    //         const shoveVector = this.aimVector.clone().setLength(-150);
+    //         equip.user.emit( MOVEMENT_EVENTS.SHOVE, shoveVector );
+    //         this.putAway(equip);
+    //         this.aborted = true;
+    //     }
+    // }
+
+    public onDamage( equip: Equipment, other: Actor ) {
+        if (!this.slashing && !this.powerAttacking && equip.holding) {
             const shoveVector = this.aimVector.clone().setLength(-150);
             equip.user.emit( MOVEMENT_EVENTS.SHOVE, shoveVector );
             this.putAway(equip);
