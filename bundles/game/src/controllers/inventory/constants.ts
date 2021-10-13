@@ -58,11 +58,13 @@ export enum ITEMCLASS {
     MAX_EQUIPPABLE = 1000,  // All classes below this line are passive and can't be equipped
     // Basic Equipment
     ARMOR,
-    QUIVER,
     WALLET,
+    BOMB_UPGRADE,
+    QUIVER,
     // Other passive items
     AMULET = 1010,
     FLIPPERS,
+    BRACELET,
 }
 
 export enum RESCLASS {
@@ -70,6 +72,7 @@ export enum RESCLASS {
     HEALTH,
     MAGIC,
     MAX_METERS = 10,
+    COINS,
     KEYS,
     BOMBS,
     ARROWS,

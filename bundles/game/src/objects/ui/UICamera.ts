@@ -11,6 +11,7 @@ export default class UICamera extends Cameras.Scene2D.Camera {
 
         UICamera.main = this;
         if (ignored) this.ignore( ignored );
+        this.roundPixels = true;
     }
 
 }

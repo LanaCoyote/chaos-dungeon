@@ -1,4 +1,4 @@
-import { Scene, Types, Geom, Math as Vector, GameObjects } from "phaser";
+import { Scene, Types, Geom, Math as Vector, GameObjects, Scale } from "phaser";
 
 import Floor from "./Floor";
 import Actor from "../../objects/actors/Actor";
@@ -9,6 +9,9 @@ import JellyKing from "../../controllers/ai/enemies/JellyKing";
 import InventoryController from "../../controllers/inventory/InventoryController";
 import Curtain from "../../effects/Curtain";
 import UICamera from "../../objects/ui/UICamera";
+import LifeMeter from "../../objects/ui/LifeMeter";
+import MagicMeter from "../../objects/ui/MagicMeter";
+import EquipmentSlot from "../../objects/ui/EquipmentSlot";
 import { EVENTS as DAMAGE_EVENTS } from "../../controllers/damage/constants";
 
 import { SCREEN_HEIGHT, SCREEN_HEIGHT_ABS, SCREEN_WIDTH_ABS, TILE_HEIGHT, TILE_WIDTH } from "../../constants";
@@ -40,9 +43,13 @@ export default class LevelScene extends Scene {
         this.load.image("actors/enemy/jelly_king", "static/jelly_king.png");
 
         this.load.spritesheet('vfx/dustcloud', 'static/dustcloud.png', {frameWidth: 24});
+        this.load.spritesheet('ui/icons', 'static/icons.png', {frameWidth: 18});
+        this.load.image("ui/itemframe", 'static/itemframe.png');
 
         this.load.tilemapCSV("tilemaps/F1", "level/f1.csv");
         this.load.json("data/level", "level/data.json");
+
+        this.scale.scaleMode = Scale.ScaleModes.FIT;
     }
 
     public create() {
@@ -112,12 +119,23 @@ export default class LevelScene extends Scene {
         this.cameras.addExisting( uiCamera );
         uiCamera.ignore( ignored );
 
-        const debugText = this.make.text({
-            text: "---- LIFE ----",
-            x: TILE_WIDTH,
-            y: TILE_WIDTH
-        });
-        uiCamera.addToRenderList(debugText);
+        const lifeMeter = new LifeMeter( this, new Geom.Rectangle( TILE_WIDTH, TILE_HEIGHT, 18 * 8, 18 ) );
+        const magicMeter = new MagicMeter( this, new Geom.Rectangle( TILE_WIDTH, TILE_HEIGHT + 18, 18 * 8, 18) );
+
+        this.add.sprite( TILE_WIDTH, TILE_HEIGHT * 3, "ui/icons", 3).setOrigin(0,0);
+        this.add.sprite( TILE_WIDTH + 18, TILE_HEIGHT * 3, "ui/icons", 2).setOrigin(0,0);
+
+        this.add.sprite( TILE_WIDTH, TILE_HEIGHT * 3 + 18, "ui/icons", 4).setOrigin(0,0);
+        this.add.sprite( TILE_WIDTH + 18, TILE_HEIGHT * 3 + 18, "ui/icons", 2).setOrigin(0,0);
+
+        this.add.sprite( TILE_WIDTH * 4, TILE_HEIGHT * 3, "ui/icons", 7).setOrigin(0,0);
+        this.add.sprite( TILE_WIDTH * 4 + 18, TILE_HEIGHT * 3, "ui/icons", 2).setOrigin(0,0);
+        
+        this.add.sprite( TILE_WIDTH * 4, TILE_HEIGHT * 3 + 18, "ui/icons", 8).setOrigin(0,0);
+        this.add.sprite( TILE_WIDTH * 4 + 18, TILE_HEIGHT * 3 + 18, "ui/icons", 2).setOrigin(0,0);
+
+        new EquipmentSlot( this, new Geom.Point( SCREEN_WIDTH_ABS - TILE_WIDTH * 4, TILE_HEIGHT * 2 ), 0 );
+        new EquipmentSlot( this, new Geom.Point( SCREEN_WIDTH_ABS - TILE_WIDTH * 2, TILE_HEIGHT * 2 ), 1 );
 
         // setInterval(() => {
         //     const index = Math.floor(Math.random() * jellies.length);

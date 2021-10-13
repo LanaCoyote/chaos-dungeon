@@ -18,7 +18,7 @@ export default class Enemy<AiControllerType> extends Actor {
     public damage: LifeController;
     public enemyData: EnemyData;
 
-    constructor( scene: Scene, origin: Vector.Vector2, enemyData: EnemyData, texture?: string ) {
+    constructor( scene: Scene, origin: Vector.Vector2, enemyData: EnemyData, texture?: string ) {   // TODO: rewrite using a new ()=>type expression instead of the createController method
         super( scene, origin, texture || enemyData.texture );
 
         this.enemyData = enemyData;

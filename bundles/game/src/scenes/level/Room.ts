@@ -1,9 +1,14 @@
 import { Geom, Math, Scene } from "phaser";
 
 import { SCREEN_HEIGHT_ABS, SCREEN_WIDTH_ABS } from "../../constants";
+import EnemyData from "../../controllers/ai/enemies/EnemyData";
 
 const MINIMUM_EXPECTED_WIDTH = SCREEN_WIDTH_ABS;
 const MINIMUM_EXPECTED_HEIGHT = SCREEN_HEIGHT_ABS;
+
+export interface EnemyGroup {
+    dataClass: new () => EnemyData;
+}
 
 export default class Room {
 
