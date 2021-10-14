@@ -9,6 +9,10 @@ import Flash from "../../../effects/Flash";
 
 export default class Shield extends PointerItemData implements WeaponData {
 
+    public displayName = "WOODEN SHIELD";
+    public shortHelp = "POINT FRONT TOWARDS ENEMY!\nTAP TO BASH ENEMIES! HOLD\nTO FEND OFF PROJECTILES!\nWON'T BLOCK MAGIC!";
+ // public shortHelp = "FOR WHEN ITS DANGEROUS TO\nGO ALONE! TAP THE BUTTON TO\nSLASH, HOLD DOWN TO CHARGE\nUP A SPIN ATTACK!";
+
     public class = ITEMCLASS.SHIELD;
     public texture = "item/shield";
     public parryTime = 0;
@@ -39,6 +43,7 @@ export default class Shield extends PointerItemData implements WeaponData {
 
     public putAway( equip: Equipment ) {
         equip.setVisible( false );
+        equip.body.setEnable( false );
         equip.user.emit( MOVEMENT_EVENTS.UNSLOW );
     }
 
@@ -49,6 +54,7 @@ export default class Shield extends PointerItemData implements WeaponData {
     public onShoot( equip: Equipment ) {
         this.parryTime = 200;
         equip.setVisible( true );
+        equip.body.setEnable( true );
         equip.user.emit( MOVEMENT_EVENTS.SLOW, 48 );
 
         equip.scene.tweens.add({

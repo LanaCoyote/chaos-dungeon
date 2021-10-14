@@ -95,10 +95,10 @@ export default class Room {
     private createEnemies(): GameObjects.Group {
         const enemies: Enemy[] = [];
         const defaultSpawnArea = new Geom.Rectangle(
-            this.rect.x + TILE_WIDTH * 2,
-            this.rect.y + TILE_HEIGHT * 2,
-            this.rect.width - TILE_WIDTH * 4,
-            this.rect.height - TILE_HEIGHT * 4
+            this.rect.x + TILE_WIDTH * 3,
+            this.rect.y + TILE_HEIGHT * 3,
+            this.rect.width - TILE_WIDTH * 6,
+            this.rect.height - TILE_HEIGHT * 6
         );
 
         this.enemyGroups.forEach(enemyGroup => {

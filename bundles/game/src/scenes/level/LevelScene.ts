@@ -47,6 +47,7 @@ export default class LevelScene extends Scene {
         this.load.spritesheet('vfx/dustcloud', 'static/dustcloud.png', {frameWidth: 24});
         this.load.spritesheet('ui/icons', 'static/icons.png', {frameWidth: 18});
         this.load.image("ui/itemframe", 'static/itemframe.png');
+        this.load.image("ui/selection", "static/item_selection.png");
 
         this.load.tilemapCSV("tilemaps/F1", "level/f1.csv");
         this.load.json("data/level", "level/data.json");
@@ -134,9 +135,6 @@ export default class LevelScene extends Scene {
         uiCamera.ignore(f1.tilemap.layers.map( layer => layer.tilemapLayer ));
 
         this.gameUI = new GameUI(this, uiCamera);
-
-        const heart = new Pickup( this, new Vector.Vector2( f1.getCurrentRoom().rect.centerX, f1.getCurrentRoom().rect.centerY ));
-        heart.addToDisplayList();
 
         setTimeout(() => {
             // f1.tilemap.putTilesAt([[1,1],[1,1]], 49, 39, true)

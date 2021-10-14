@@ -47,6 +47,7 @@ export default class Equipment extends Actor {
         this.damage.activate();
 
         Equipment.living.push( this );
+        console.log(Equipment.living);
 
         if (this.item) {
             this.item.onEquip( this );
@@ -76,11 +77,15 @@ export default class Equipment extends Actor {
     }
 
     public setItem( item: ItemData ) {
-        this.setTexture( item.texture );
+        this.setTexture( `actors/${item.texture}` );
         this.class = item.class;
         this.item = item;
+        this.damage.data = (item as unknown as WeaponData);
 
         this.item.onEquip( this );
+
+        this.setAngle(0);
+        this.body.reset(this.x, this.y);
     }
 
     public update( time: number, delta: number ) { 

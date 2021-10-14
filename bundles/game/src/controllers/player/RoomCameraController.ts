@@ -100,11 +100,12 @@ export default class RoomCameraController extends Controller implements UpdateCo
     }
 
     public deroundCameraScroll(horizontal: boolean) {
+        const center = this.attached.getCenter();
         if (horizontal) {
-            const newX = this.attached.getCenter().x;
+            const newX = center.x;
             this.camera.pan(newX, this.camera.worldView.top + this.camera.centerY, 750, 'Linear');
         } else {
-            const newY = this.attached.getCenter().y;
+            const newY = center.y;
             this.camera.pan(this.camera.worldView.left + this.camera.centerX, newY, 750, 'Linear');
         }
     }

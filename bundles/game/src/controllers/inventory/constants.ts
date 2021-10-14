@@ -62,9 +62,13 @@ export enum ITEMCLASS {
     BOMB_UPGRADE,
     QUIVER,
     // Other passive items
-    AMULET = 1010,
+    AMULET = 1100,
     FLIPPERS,
     BRACELET,
+    MAX_CHARACTER = 2000,   // Classes below this line are dungeon items and are shown on the map screen
+    MAP,
+    COMPASS,
+    BIG_KEY,
 }
 
 export enum RESCLASS {

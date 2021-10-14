@@ -14,6 +14,15 @@ export default class InventoryController extends Controller {
     private static InventoryState: Map<ITEMCLASS, ItemData> = new Map();
     public static EquippedItems: Array<Equipment> = [];
 
+    public static getAllItems( minimum?: ITEMCLASS, maximum?: ITEMCLASS ): ItemData[] {
+        const items: ItemData[] = [];
+        this.InventoryState.forEach((item, key) => {
+            if ( key < minimum || key > maximum ) return;
+            items.push( item );
+        })
+        return items;
+    }
+
     constructor( attached?: Actor ) {
         super(attached);
 
@@ -28,8 +37,12 @@ export default class InventoryController extends Controller {
         this.on(EVENTS.RELEASE_EQUIP, this.releaseEquipment.bind(this));
         this.on(EVENTS.SHOOT_EQUIP, this.shootEquipment.bind(this));
 
-        InventoryController.EquippedItems[0] = new Equipment(this.scene, attached, new Sword());
-        InventoryController.EquippedItems[1] = new Equipment(this.scene, attached, new Shield());
+        InventoryController.InventoryState = new Map();
+        InventoryController.InventoryState.set(ITEMCLASS.SWORD, new Sword());
+        InventoryController.InventoryState.set(ITEMCLASS.SHIELD, new Shield());
+
+        InventoryController.EquippedItems[0] = new Equipment(this.scene, attached, InventoryController.InventoryState.get(ITEMCLASS.SWORD));
+        InventoryController.EquippedItems[1] = new Equipment(this.scene, attached, InventoryController.InventoryState.get(ITEMCLASS.SHIELD));
 
     }
 
