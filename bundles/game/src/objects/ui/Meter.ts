@@ -23,9 +23,7 @@ export default abstract class Meter extends GameObjects.Group {
         this.foreground = fgSprite;
 
         bgSprite.setOrigin(0,0);
-        bgSprite.addToDisplayList();
         fgSprite.setOrigin(0,0);
-        fgSprite.addToDisplayList();
     }
 
     public setValue( newValue: number ) {

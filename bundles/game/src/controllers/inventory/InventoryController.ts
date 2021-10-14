@@ -7,6 +7,8 @@ import Shield from "./items/Shield";
 import Actor from "../../objects/actors/Actor";
 import Equipment from "../../objects/actors/Equipment";
 
+import { EVENTS as DAMAGE_EVENTS } from "../damage/constants";
+
 export default class InventoryController extends Controller {
 
     private static InventoryState: Map<ITEMCLASS, ItemData> = new Map();
@@ -17,6 +19,8 @@ export default class InventoryController extends Controller {
 
         this.on(EVENTS.ADD_ITEM, this.addItem.bind(this));
         this.on(EVENTS.DROP_ITEM, this.dropItem.bind(this));
+
+        this.on(EVENTS.ADD_RESOURCE, this.addResource.bind(this));
 
         this.on(EVENTS.RESET_INVENTORY, this.resetInventory.bind(this));
         this.on(EVENTS.CHANGE_INVENTORY, this.changeInventory.bind(this));
@@ -40,7 +44,9 @@ export default class InventoryController extends Controller {
     }
 
     public addResource(resClass: RESCLASS, amount: number) {
-        
+        if (resClass === RESCLASS.HEALTH) {
+            this.attached.emit( DAMAGE_EVENTS.HEAL_DAMAGE, amount );
+        }
     }
 
     public deactivate() {

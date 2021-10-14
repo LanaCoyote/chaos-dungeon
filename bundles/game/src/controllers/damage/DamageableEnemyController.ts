@@ -9,11 +9,13 @@ import {DAMAGETYPES} from "../damage/constants";
 
 export default class DamageableEnemyController extends LifeController {
 
-    public attached: Enemy<any>;
+    public attached: Enemy;
     public enemyData: EnemyData;
     public touchDamageDealer: TouchDamageEnemyController;
 
-    constructor( attached: Enemy<any>, data: EnemyData ) {
+    private isStunned: boolean;
+
+    constructor( attached: Enemy, data: EnemyData ) {
         super( attached, data.life );
 
         this.enemyData = data;
@@ -31,13 +33,18 @@ export default class DamageableEnemyController extends LifeController {
     }
 
     public onPreventDamage(amount: number, type: DAMAGETYPES, source: Actor) {
-        if (type === DAMAGETYPES.STUN && !this.enemyData.immunities.includes(DAMAGETYPES.STUN)) {
+        if (type === DAMAGETYPES.STUN && !this.enemyData.immunities.includes(DAMAGETYPES.STUN) && !this.isStunned) {
             this.attached.deactivateAllControllers();
+            this.activate();
+            this.attached.body.setEnable(true);
+            this.attached.body.reset( this.attached.x, this.attached.y );
             new Stunned( this.attached, 2000 );
+            this.isStunned = true;
 
             this.scene.time.delayedCall( 2000, () => {
                 if (this && this.attached) {
                     this.attached.reactivateAllControllers();
+                    this.isStunned = false;
                 }
             });
         }

@@ -12,10 +12,6 @@ export default class EquipmentSlot extends GameObjects.Group {
         const hotkey = new GameObjects.Text( scene, pos.x, pos.y + 24, slot ? "RMB" : "LMB", { fontFamily: "monospace", stroke: "black", strokeThickness: 3 } );
         hotkey.setOrigin( 0.5, 0.66 );
 
-        frame.addToDisplayList();
-        icon.addToDisplayList();
-        hotkey.addToDisplayList();
-
         super( scene, [frame, icon, hotkey] );
     }
 

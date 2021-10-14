@@ -21,7 +21,7 @@ export default class TouchDamageEnemyController extends TouchDamageDealerControl
     }
 
     public canDealDamage(): boolean {
-        return this.active && !(this.damageReceiver && this.damageReceiver.isInvulnerable());
+        return this.active && this.damageReceiver && !this.damageReceiver.isInvulnerable();
     }
 
     public checkCollision( ob1: GameObjects.GameObject, ob2: GameObjects.GameObject, body1: Physics.Arcade.Body, body2: Physics.Arcade.Body ) {

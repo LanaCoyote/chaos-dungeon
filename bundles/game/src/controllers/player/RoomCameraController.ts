@@ -21,6 +21,7 @@ export default class RoomCameraController extends Controller implements UpdateCo
     public floor: Floor;
     public room: Room;
     public nextRoom: Room;
+    public scene: LevelScene;
     public state: STATES;
 
     constructor(attached: Actor, camera?: Cameras.Scene2D.Camera) {
@@ -31,6 +32,8 @@ export default class RoomCameraController extends Controller implements UpdateCo
         } else {
             this.camera = new Cameras.Scene2D.Camera(0, 0, SCREEN_WIDTH_ABS, SCREEN_HEIGHT_ABS);
         }
+
+        this.camera.setDeadzone( SCREEN_WIDTH_ABS / 4, SCREEN_HEIGHT_ABS / 4 );
 
         if (attached.scene instanceof LevelScene) {
             this.floor = attached.scene.getCurrentFloor();
@@ -47,9 +50,9 @@ export default class RoomCameraController extends Controller implements UpdateCo
 
     public endTransitionToNewRoom() {
         // start following again
-        console.log(this.attached);
         this.camera.startFollow(this.attached);
 
+        this.scene.getCurrentFloor().setCurrentRoom(this.room);
         this.room.activate();
         this.state = STATES.FOLLOWING;
 
@@ -107,8 +110,6 @@ export default class RoomCameraController extends Controller implements UpdateCo
     }
 
     public scrollToNewRoom(cameraMovement: Vec.Vector2, playerMovement: Vec.Vector2) {
-        console.log(cameraMovement, playerMovement);
-
         this.roundOffCameraScroll(playerMovement.x === 0);
         this.scene.tweens.add({
             targets: this.attached,
@@ -119,14 +120,13 @@ export default class RoomCameraController extends Controller implements UpdateCo
             onComplete: () => {
                 setTimeout(() => {
                     this.attached.setVisible(false);
-                    this.attached.setPosition(this.attached.x - playerMovement.x, this.attached.y - playerMovement.y);
-                    console.log("starting camera tween...");
+                    this.attached.setPosition(this.attached.x - playerMovement.x, this.attached.y - playerMovement.y); 
+                    this.nextRoom.preload();
 
                     this.camera.once( Cameras.Scene2D.Events.PAN_COMPLETE, () => {
-                        console.log("ended camera tween");
-
                         this.attached.setVisible(true);
 
+                        this.room.unload();
                         this.room = this.nextRoom;
                         this.setBoundsFromRoom();
                         this.deroundCameraScroll(playerMovement.x === 0);

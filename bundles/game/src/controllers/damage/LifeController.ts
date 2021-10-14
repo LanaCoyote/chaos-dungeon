@@ -35,7 +35,7 @@ export default class LifeController extends DamageableController {
         // knock back from source
         const hitPos = new Vector.Vector2( source.x, source.y );
         const repulsion = new Vector.Vector2( this.attached.x, this.attached.y ).subtract( hitPos );
-        repulsion.setLength( 250 );
+        repulsion.setLength( this.repulsionLength );
 
         // flicker effect
         new Flicker( this.attached, this.invulnPeriod );

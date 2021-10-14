@@ -1,7 +1,7 @@
 import { Geom, Scene, Tilemaps } from "phaser";
 
 import { SCREEN_WIDTH, SCREEN_HEIGHT, TILE_WIDTH, TILE_HEIGHT } from "../../constants";
-import Room from "./Room";
+import Room, {EnemyGroup} from "./Room";
 
 export default class Floor {
     private active: boolean;
@@ -36,7 +36,7 @@ export default class Floor {
         this.active = false;
     }
 
-    public addRoom(roomPlacement: Geom.Rectangle|string): Room {
+    public addRoom(roomPlacement: Geom.Rectangle|string, enemyGroups: EnemyGroup[]): Room {
         if (typeof roomPlacement === "string") {
             const parts = roomPlacement.split(" ");
             roomPlacement = new Geom.Rectangle(
@@ -48,7 +48,7 @@ export default class Floor {
         }
 
         const roomKey = this.toNiceString() + `Room${this.roomData.length}`;
-        const room = new Room(this.scene, roomPlacement, roomKey);
+        const room = new Room(this.scene, roomPlacement, roomKey, enemyGroups);
 
         // want to put the room data as far up and left as possible, so loop through the array
         // OPTIMIZE: this runs O(n) complexity each time, could be half as fast with a bin search

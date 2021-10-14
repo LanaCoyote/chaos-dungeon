@@ -2,7 +2,7 @@ import { Math as Vectors, Scene, GameObjects, Physics, BlendModes } from "phaser
 
 import { DEPTH_FLOOR } from "../../constants";
 import Actor from "./Actor";
-import TestDamageReceiver from "../../controllers/damage/TestDamageReceiver";
+import DamageablePlayerController from "../../controllers/damage/DamageablePlayerController";
 import InventoryController from "../../controllers/inventory/InventoryController";
 import MovementController from "../../controllers/physics/MovementController";
 import KbmInputController from "../../controllers/player/KbmInputController";
@@ -13,7 +13,7 @@ export default class Hero extends Actor {
     public static activeHero: Hero;
 
     public body: Physics.Arcade.Body;
-    public damage: TestDamageReceiver;
+    public damage: DamageablePlayerController;
 
     constructor(scene: Scene, origin: Vectors.Vector2) {
         super(scene, origin, "hero");
@@ -21,10 +21,11 @@ export default class Hero extends Actor {
         const movementController = new MovementController(this);
         movementController.acceleration = 800;
         movementController.maxSpeed = 180;
-        movementController.intentWeight = 25;
+        movementController.intentWeight = 35;
+        movementController.decelRate = 15;
         movementController.activate();
 
-        const damageController = new TestDamageReceiver(this);
+        const damageController = new DamageablePlayerController(this);
         damageController.invulnPeriod = 1000;
         damageController.activate();
 

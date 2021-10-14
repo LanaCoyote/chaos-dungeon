@@ -8,6 +8,8 @@ import LevelScene from "../../scenes/level/LevelScene";
 
 export default class Equipment extends Actor {
 
+    public static living: Equipment[] = [];
+
     public body: Physics.Arcade.Body;
     public scene: LevelScene;
 
@@ -44,9 +46,7 @@ export default class Equipment extends Actor {
         this.damage = new TouchDamageWeaponController(this, item as unknown as WeaponData); // bad
         this.damage.activate();
 
-        // this.scene.physics.add.overlap(this, this.scene.getCurrentFloor().tilemap.getLayer(0).tilemapLayer, () => this.onTouch());
-        // this.body.onOverlap = true;
-        // this.scene.physics.world.on("overlap", () => console.log("donk"));
+        Equipment.living.push( this );
 
         if (this.item) {
             this.item.onEquip( this );

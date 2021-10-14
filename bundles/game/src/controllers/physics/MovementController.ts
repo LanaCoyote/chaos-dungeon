@@ -48,6 +48,10 @@ export default class MovementController extends ArcadePhysicsController implemen
         this.active = true;
         this.body.setEnable(true);
         this.unfreeze();
+
+        if (this.attached.baseDepth) {
+            this.attached.setDepth( this.attached.baseDepth + this.attached.getBottomCenter().y );
+        }
     }
 
     public deactivate() {

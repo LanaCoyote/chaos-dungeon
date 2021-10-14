@@ -8,7 +8,8 @@ import { EVENTS, DAMAGETYPES } from "./constants";
 export default abstract class DamageableController extends Controller {
     
     public attached: Actor;
-    public invulnPeriod: number = 500;  // how long (in ms) until the target can take damage again
+    public invulnPeriod: number = 500;      // how long (in ms) until the target can take damage again
+    public repulsionLength: number = 250;   // how much force the actor is shoved with when they take damage
 
     private invulnFrames: number = 0;
 
@@ -61,7 +62,8 @@ export default abstract class DamageableController extends Controller {
     }
 
     public die(damage: number, type: DAMAGETYPES, source: Actor, attacker?: Actor) {
-        this.onDie(damage, type, attacker);
+        this.attached.emit(EVENTS.DIED, damage, type, attacker || source);
+        this.onDie(damage, type, attacker || source);
     }
 
     public onPreventDamage(amount: number, type: DAMAGETYPES, source: Actor) {}

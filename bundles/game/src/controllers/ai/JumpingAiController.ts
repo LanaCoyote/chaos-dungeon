@@ -84,7 +84,7 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
             return JumpingEnemyStates.STANDING;
         } else {
             // see if the hero is nearby
-            if (Hero.activeHero) {
+            if (Hero.activeHero && Hero.activeHero.body) {
                 const divider = Hero.activeHero.body.position.subtract( this.attached.body.position );
                 if (this.data.shortHopDistance && divider.lengthSq() < this.data.shortHopDistance * this.data.shortHopDistance) {
                     return JumpingEnemyStates.SHORTHOP;
