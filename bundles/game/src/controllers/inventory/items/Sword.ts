@@ -18,6 +18,7 @@ export default class Sword extends PointerItemData implements WeaponData {
     public class = ITEMCLASS.SWORD;
     public texture = "item/sword";
     public slashDistance = 1;
+    public maxSlashDistance = 24;
     public slashTime = 0;
     public chargeTime = 0;
     public slashing: Boolean;
@@ -164,7 +165,7 @@ export default class Sword extends PointerItemData implements WeaponData {
             equip.setVisible(true);
             equip.scene.tweens.add({
                 targets: this,
-                slashDistance: 24,
+                slashDistance: this.maxSlashDistance,
                 duration: 50,
                 ease: "Sine"
             });

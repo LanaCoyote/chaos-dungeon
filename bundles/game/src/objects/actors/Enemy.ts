@@ -55,7 +55,7 @@ export default class Enemy extends Actor {
             this.move.activate();
             this.ai.activate();
             this.damage.activate();
-            this.damage.touchDamageDealer.activate();
+            if (this.damage.touchDamageDealer) this.damage.touchDamageDealer.activate();
             this.setVisible(true);
         });
     }

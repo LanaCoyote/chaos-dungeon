@@ -15,6 +15,7 @@ import { EVENTS as DAMAGE_EVENTS } from "../../controllers/damage/constants";
 
 import { SCREEN_HEIGHT, SCREEN_HEIGHT_ABS, SCREEN_WIDTH_ABS, TILE_HEIGHT, TILE_WIDTH } from "../../constants";
 import { EnemyGroup } from "./Room";
+import Ralsei from "../../controllers/ai/enemies/Ralsei";
 
 export default class LevelScene extends Scene {
 
@@ -37,9 +38,11 @@ export default class LevelScene extends Scene {
     public preload() {
         this.load.image("tilesets/placeholder_tiles", "tiles");
         this.load.image("actors/hero", "static/bear.png");
+        this.load.image("actors/ralsei", "static/ralsei.png");
         this.load.image("actors/item/pickups", "static/pickups.png");
         this.load.image("actors/item/sword", "static/sword.png");
         this.load.image("actors/item/shield", "static/shield.png");
+        this.load.image("actors/item/joint", "static/joint.png")
 
         this.load.image("actors/enemy/jelly", "static/jelly.png");
         this.load.image("actors/enemy/jelly_king", "static/jelly_king.png");
@@ -51,6 +54,8 @@ export default class LevelScene extends Scene {
 
         this.load.tilemapCSV("tilemaps/F1", "level/f1.csv");
         this.load.json("data/level", "level/data.json");
+
+        // this.scale.scaleMode = Scale.RESIZE;
     }
 
     public create() {
@@ -78,7 +83,7 @@ export default class LevelScene extends Scene {
             if (room.e && room.e instanceof Array) {
                 room.e.forEach((enemyGroupDef: any) => {
                     enemyData.push({
-                        EnemyDataClass: enemyGroupDef.i === 1 ? JellyKing : Jelly,
+                        EnemyDataClass: enemyGroupDef.i === 1 ? Ralsei : Jelly,
                         count: enemyGroupDef.c || 1
                     });
                 });

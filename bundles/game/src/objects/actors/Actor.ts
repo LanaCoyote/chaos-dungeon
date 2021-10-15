@@ -88,7 +88,7 @@ export default abstract class Actor extends GameObjects.Sprite implements Refere
     }
 
     public destroy() {
-        if (this.controllers.size) {
+        if (this.controllers && this.controllers.size) {
             this.controllers.forEach(ctrl => {
                 ctrl.destroy();
             });
