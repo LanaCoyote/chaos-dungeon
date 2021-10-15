@@ -6,6 +6,7 @@ import DamageablePlayerController from "../../controllers/damage/DamageablePlaye
 import InventoryController from "../../controllers/inventory/InventoryController";
 import MovementController from "../../controllers/physics/MovementController";
 import KbmInputController from "../../controllers/player/KbmInputController";
+import VirtualInputController from "../../controllers/player/VirtualInputController";
 import RoomCameraController from "../../controllers/player/RoomCameraController";
 
 export default class Hero extends Actor {
@@ -34,6 +35,9 @@ export default class Hero extends Actor {
 
         const keyboardController = new KbmInputController(this);
         keyboardController.activate();
+
+        const virtualController = new VirtualInputController(this);
+        virtualController.activate();
 
         const roomCamController = new RoomCameraController(this, this.scene.cameras.main);
         roomCamController.activate();

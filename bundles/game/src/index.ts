@@ -25,7 +25,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: false
+            debug: true
         }
     },
 
@@ -54,10 +54,10 @@ class GameWindow {
 }
 
 // do this in the www bundle
-window.onload = () => {
+window.addEventListener("load", () => {
     console.log("loaded game bundle");
     (window as any).game = new GameWindow('game-window');
-};
+});
 
 document.addEventListener('contextmenu', (ev) => {
     if ((ev.target as HTMLElement).tagName.toUpperCase() === "CANVAS") {
