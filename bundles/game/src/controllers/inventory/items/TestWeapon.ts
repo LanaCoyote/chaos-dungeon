@@ -7,9 +7,10 @@ import Sword from "./Sword";
 
 export default class TestWeapon extends Sword {
 
-    class = ITEMCLASS.BOW;
+    class = ITEMCLASS.FIRE_ARROW;
     texture = "item/joint";
     maxSlashDistance = 14;
+    useAngledIcon = false;
 
     public startPowerAttack( equip: Equipment ) {
 

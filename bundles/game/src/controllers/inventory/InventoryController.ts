@@ -9,6 +9,7 @@ import Equipment from "../../objects/actors/Equipment";
 
 import { EVENTS as DAMAGE_EVENTS } from "../damage/constants";
 import TestWeapon from "./items/TestWeapon";
+import Bow from "./items/Bow";
 
 export default class InventoryController extends Controller {
 
@@ -41,7 +42,8 @@ export default class InventoryController extends Controller {
         InventoryController.InventoryState = new Map();
         InventoryController.InventoryState.set(ITEMCLASS.SWORD, new Sword());
         InventoryController.InventoryState.set(ITEMCLASS.SHIELD, new Shield());
-        InventoryController.InventoryState.set(ITEMCLASS.BOW, new TestWeapon());
+        // InventoryController.InventoryState.set(ITEMCLASS.FIRE_ARROW, new TestWeapon());
+        InventoryController.InventoryState.set(ITEMCLASS.BOW, new Bow());
 
         InventoryController.EquippedItems[0] = new Equipment(this.scene, attached, InventoryController.InventoryState.get(ITEMCLASS.SWORD));
         InventoryController.EquippedItems[1] = new Equipment(this.scene, attached, InventoryController.InventoryState.get(ITEMCLASS.SHIELD));

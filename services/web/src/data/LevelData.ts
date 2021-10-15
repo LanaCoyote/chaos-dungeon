@@ -3,8 +3,8 @@ import express from "express";
 import { generateRoom } from "./generator.js";
 
 const leveldefs = [
-    {p:{x:2,y:3,w:1,h:1},e:[{i:1,c:1}]},
-    {p:{x:2,y:1,w:2,h:2},e:[{i:1,c:1}]},//[{i:0,c:100}]},
+    {p:{x:2,y:3,w:1,h:1},e:[]},
+    {p:{x:2,y:1,w:2,h:2},e:[{i:0,c:100}]},
     {p:{x:3,y:3,w:2,h:1},e:[{i:0,c:8},{i:1,c:2}]},
     {p:{x:0,y:1,w:2,h:1},e:[{i:0,c:16}]},
     {p:{x:4,y:1,w:1,h:2},e:[{i:0,c:8},{i:1,c:2}]},

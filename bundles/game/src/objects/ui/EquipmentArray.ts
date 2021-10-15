@@ -24,6 +24,7 @@ export default class EquipmentArray extends GameObjects.Container {
         const coords = EquipmentArray.getCoords(index, cols);
         const sprite = new GameObjects.Sprite( scene, coords.x, coords.y, `actors/${item.texture}` );
         sprite.setInteractive();
+        if (item.useAngledIcon) sprite.setAngle(45);
 
         return sprite;
     }
@@ -70,7 +71,9 @@ export default class EquipmentArray extends GameObjects.Container {
         const newItems = InventoryController.getAllItems(this.range[0], this.range[1]);
         newItems.forEach((item, index) => {
             if (this.length > index) {
-                (this.getAt(index) as GameObjects.Sprite).setTexture(`actors/${item.texture}`).setVisible(true);
+                (this.getAt(index) as GameObjects.Sprite).setTexture(`actors/${item.texture}`)
+                    .setVisible(true)
+                    .setAngle(item.useAngledIcon ? 45 : 0);
             } else {
                 const sprite = EquipmentArray.makeSprite(this.scene, this.cols, item, index);
                 this.add(sprite);

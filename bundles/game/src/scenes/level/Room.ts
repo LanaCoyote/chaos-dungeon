@@ -1,8 +1,10 @@
-import { GameObjects, Geom, Math as Vector, Scene } from "phaser";
+import { Game, GameObjects, Geom, Math as Vector, Physics, Scene } from "phaser";
 
 import { SCREEN_HEIGHT_ABS, SCREEN_WIDTH_ABS, TILE_HEIGHT, TILE_WIDTH } from "../../constants";
 import EnemyData from "../../controllers/ai/enemies/EnemyData";
 import Enemy from "../../objects/actors/Enemy";
+import Equipment from "../../objects/actors/Equipment";
+import Hero from "../../objects/actors/Hero";
 
 const MINIMUM_EXPECTED_WIDTH = SCREEN_WIDTH_ABS;
 const MINIMUM_EXPECTED_HEIGHT = SCREEN_HEIGHT_ABS;
@@ -27,6 +29,7 @@ export default class Room {
 
     private enemyGroups: EnemyGroup[];
     private enemies: GameObjects.Group;
+    private enemyColliders: Physics.Arcade.Collider[] = [];
 
     constructor(scene: Scene, rect: Geom.Rectangle, key: string, enemyGroups: EnemyGroup[]) {
         this.active = false;
@@ -48,6 +51,11 @@ export default class Room {
     }
 
     public unload() {
+        this.enemyColliders.forEach(collider => {
+            if (collider && collider.object1 && collider.object2) collider.destroy()
+        });
+
+        this.enemyColliders.length = 0;
         this.destroyEnemies();
     }
 
@@ -56,6 +64,11 @@ export default class Room {
 
         if (!this.enemies) this.enemies = this.createEnemies();
         this.spawnEnemies();
+    }
+
+    public addEnemyCollider( other: GameObjects.GameObject|GameObjects.GameObject[] ) {
+        const collider = this.scene.physics.add.overlap( this.enemies, other );
+        this.enemyColliders.push(collider);
     }
 
     public deactivate() {
@@ -68,6 +81,10 @@ export default class Room {
 
     public isInsideRoom(bounds: Geom.Rectangle): boolean {
         return Geom.Rectangle.ContainsRect(this.rect, bounds);
+    }
+
+    public getEnemyGroup(): GameObjects.Group {
+        return this.enemies;
     }
 
     public getExitVector(bounds: Geom.Rectangle): Vector.Vector2 {
@@ -137,6 +154,9 @@ export default class Room {
                 enemy.addToDisplayList();
             });
         });
+
+        this.addEnemyCollider( Hero.activeHero );
+        this.addEnemyCollider( Equipment.living );
     }
 
 }

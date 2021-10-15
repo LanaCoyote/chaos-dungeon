@@ -14,6 +14,7 @@ export default class Sword extends PointerItemData implements WeaponData {
 
     public displayName = "WOODEN SWORD";
     public shortHelp = "FOR WHEN ITS DANGEROUS TO\nGO ALONE! TAP THE BUTTON TO\nSLASH, HOLD DOWN TO CHARGE\nUP A SPIN ATTACK!";
+    public useAngledIcon = true;
 
     public class = ITEMCLASS.SWORD;
     public texture = "item/sword";

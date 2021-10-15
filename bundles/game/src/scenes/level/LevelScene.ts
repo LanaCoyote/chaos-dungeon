@@ -42,7 +42,8 @@ export default class LevelScene extends Scene {
         this.load.image("actors/item/pickups", "static/pickups.png");
         this.load.image("actors/item/sword", "static/sword.png");
         this.load.image("actors/item/shield", "static/shield.png");
-        this.load.image("actors/item/joint", "static/joint.png")
+        this.load.image("actors/item/joint", "static/joint.png");
+        this.load.spritesheet("actors/item/bow", "static/bow.png", {frameWidth: 24});
 
         this.load.image("actors/enemy/jelly", "static/jelly.png");
         this.load.image("actors/enemy/jelly_king", "static/jelly_king.png");
@@ -83,7 +84,7 @@ export default class LevelScene extends Scene {
             if (room.e && room.e instanceof Array) {
                 room.e.forEach((enemyGroupDef: any) => {
                     enemyData.push({
-                        EnemyDataClass: enemyGroupDef.i === 1 ? Ralsei : Jelly,
+                        EnemyDataClass: enemyGroupDef.i === 1 ? JellyKing : Jelly,
                         count: enemyGroupDef.c || 1
                     });
                 });

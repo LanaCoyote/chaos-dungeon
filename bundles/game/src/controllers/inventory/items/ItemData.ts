@@ -18,6 +18,7 @@ export default abstract class ItemData {
 
     public readonly displayName: string;
     public readonly shortHelp: string;
+    public readonly useAngledIcon: boolean;
 
     public canUseAnotherItem(equipActor: Equipment, other: ItemData): boolean { return true }
     public onEquip(equipActor: Equipment) {}

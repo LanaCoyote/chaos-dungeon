@@ -24,6 +24,7 @@ export default class EquipmentSlot extends GameObjects.Group {
     public updateEquipmentIcon() {
         const itemData = InventoryController.EquippedItems[this.slot].item;
         this.icon.setTexture( `actors/${itemData.texture}` );
+        // this.icon.setAngle( itemData.useAngledIcon ? 45 : 0 );
     }
 
 }
