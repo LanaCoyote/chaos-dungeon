@@ -1,6 +1,6 @@
 import { Geom, Scene, Tilemaps } from "phaser";
 
-import { SCREEN_WIDTH, SCREEN_HEIGHT, TILE_WIDTH, TILE_HEIGHT } from "../../constants";
+import { SCREEN_WIDTH, SCREEN_HEIGHT, TILE_WIDTH, TILE_HEIGHT, IMPORTANT_TILES, DEPTH_ALWAYSFRONT } from "../../constants";
 import Room, {EnemyGroup} from "./Room";
 
 export default class Floor {
@@ -103,7 +103,14 @@ export default class Floor {
         );
 
         this.tilemap.createLayer(0, this.tileset);
-        this.tilemap.setCollision(1, true, true, 0, true);
+        this.tilemap.setCollision(IMPORTANT_TILES.WALL, true, true, 0, true);
+
+        // create special layers
+        const overheadTiles = this.tilemap.filterTiles((tile: Tilemaps.Tile) => IMPORTANT_TILES.OVERHEAD.includes(tile.index));
+        const overheadLayer = this.tilemap.createBlankLayer('overhead', this.tileset);
+        overheadTiles.forEach((tile: Tilemaps.Tile) => overheadLayer.putTileAt(tile, tile.x, tile.y));
+        overheadLayer.setDepth(Number.MAX_SAFE_INTEGER);
+        this.tilemap.setLayer(0);
     }
 
     private unloadTilemap() {

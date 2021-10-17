@@ -108,11 +108,11 @@ export default abstract class SpecialTile extends Tilemaps.Tile implements Refer
         }
     }
 
-    public getController(key: Symbol|Controller): Controller {
-        if (key instanceof Controller) key = key.key;
+    // public getController(key: Symbol|Controller): Controller {
+    //     if (key instanceof Controller) key = key.key;
 
-        return this.controllers.get(key);
-    }
+    //     return this.controllers.get(key);
+    // }
 
     public hasController(key: Symbol): boolean {
         return this.controllers.has(key);

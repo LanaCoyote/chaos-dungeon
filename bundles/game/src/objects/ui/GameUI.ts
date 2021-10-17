@@ -1,7 +1,6 @@
 import { GameObjects, Geom, Scene } from "phaser";
 
 import Hero from "../../objects/actors/Hero";
-import DamageablePlayerController from "../../controllers/damage/DamageablePlayerController";
 
 import LifeMeter from "./LifeMeter"
 import MagicMeter from "./MagicMeter";
@@ -12,6 +11,7 @@ import SubscreenWindow from "./SubscreenWindow";
 import EquipmentArray from "./EquipmentArray";
 import { ITEMCLASS } from "../../controllers/inventory/constants";
 import ItemSelection from "./ItemSelection";
+import { LIFE_DATA_KEY } from "../../controllers/damage/LifeController";
 
 export default class GameUI extends GameObjects.Container {
 
@@ -86,18 +86,15 @@ export default class GameUI extends GameObjects.Container {
         subscreen.setVisible(false);
         scene.input.keyboard.on("keydown-SPACE", () => {
             subscreen.setVisible(!subscreen.visible);
+            scene.time.paused = !scene.time.paused;
+            if (scene.time.paused) scene.tweens.pauseAll();
+            console.log("paused:", scene.time.paused);
         });
     }
 
     public update(time: number, delta: number) {
-
-        const heroLifeController = Hero.activeHero.getController(Symbol.for("[Controller DamageablePlayerController]")) as DamageablePlayerController;
-        if (heroLifeController) {
-            this.lifeMeter.setValue(heroLifeController.life);
-        }
-
+        this.lifeMeter.setValue(Hero.activeHero.getData(LIFE_DATA_KEY) || 0);
         this.equipSlots.forEach(slot => slot.updateEquipmentIcon());
-
     }
 
 }

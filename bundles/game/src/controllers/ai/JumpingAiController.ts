@@ -5,7 +5,7 @@ import EnemyData from "./enemies/EnemyData";
 import Hero from "../../objects/actors/Hero";
 import LevelScene from "../../scenes/level/LevelScene";
 
-import { DEPTH_FLOOR, DEPTH_FLYING } from "../../constants";
+import { DEPTH_FLOOR, DEPTH_FLYING, IMPORTANT_TILES } from "../../constants";
 import MovementController, { EVENTS as MOVEMENT_EVENTS } from "../physics/MovementController";
 
 export enum JumpingEnemyStates {
@@ -38,11 +38,6 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
 
     public scene: LevelScene;
     public state: JumpingEnemyStates = JumpingEnemyStates.STANDING;
-
-    public onActivated() {
-        const move: MovementController = this.attached.getController(Symbol.for("[Controller MovementController]")) as MovementController;
-        move.decelRate = (4 * 1500) / this.data.jumpDuration;
-    }
 
     public onChangeState(oldState: JumpingEnemyStates, newState: JumpingEnemyStates) {
         let jumpDestination: Geom.Point;
@@ -107,7 +102,7 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
             nextPoint = jumpableRadius.getRandomPoint( nextPoint );
             pointIsValid = currentFloor.getCurrentRoom().rect.contains( nextPoint.x, nextPoint.y );
             if (pointIsValid && !this.data.canLandOnWalls) {
-                if (currentFloor.tilemap.getTileAtWorldXY( nextPoint.x, nextPoint.y ).index === 1) {
+                if (currentFloor.tilemap.getTileAtWorldXY( nextPoint.x, nextPoint.y ).collides) {
                     pointIsValid = false;
                 } 
             }
@@ -130,25 +125,23 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
             ease: 'Sine'
         });
 
-        this.scene.tweens.add({
+        this.scene.tweens.timeline({
+            tweens: [{
+                y: destination.y - this.data.jumpHeight,
+                ease: 'Sine',
+                onComplete: () => {
+                    if (!this.attached) return;
+                    this.attached.emit( MOVEMENT_EVENTS.SHOVE, new Vector.Vector2( xMovement, this.data.jumpHeight ) );
+                }
+            }, {
+                y: destination.y,
+                ease: 'Bounce',
+            }],
+            totalDuration: this.data.jumpDuration,
             targets: this.attached,
-            y: destination.y - this.data.jumpHeight,
-            duration: this.data.jumpDuration / 2,
-            ease: 'Sine',
             onComplete: () => {
                 if (!this.attached) return;
-                this.attached.emit( MOVEMENT_EVENTS.SHOVE, new Vector.Vector2( xMovement, this.data.jumpHeight ) );
-
-                this.scene.tweens.add({
-                    targets: this.attached,
-                    y: destination.y,
-                    duration: this.data.jumpDuration / 2,
-                    ease: 'Bounce',
-                    onComplete: () => {
-                        if (!this.attached) return;
-                        this.attached.setBaseDepth( DEPTH_FLOOR );
-                    }
-                });
+                this.attached.setBaseDepth( DEPTH_FLOOR );
             }
         });
     }

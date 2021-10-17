@@ -11,7 +11,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
         // height: "95%",
         mode: Phaser.Scale.ScaleModes.FIT,
         expandParent: false,
-        zoom: Phaser.Scale.Zoom.ZOOM_2X,
+        // zoom: Phaser.Scale.Zoom.ZOOM_2X,
         // zoom: SCREEN_ZOOM,
         autoCenter: Phaser.Scale.Center.CENTER_BOTH,
     },

@@ -71,7 +71,7 @@ export default class MovementController extends ArcadePhysicsController implemen
         this.state = MOVESTATE.FROZEN;
 
         if (duration) {
-            setTimeout(() => this.unfreeze(), duration);
+            this.scene.time.delayedCall(duration, () => this.unfreeze());
         }
     }
 

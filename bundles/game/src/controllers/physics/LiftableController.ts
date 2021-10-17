@@ -78,23 +78,20 @@ export default class LiftableController extends ArcadePhysicsController implemen
         this.body.setOffset( 0, this.liftHeight );
         this.body.setVelocity( throwVector.x, throwVector.y * (SCREEN_HEIGHT/SCREEN_WIDTH) );
         this.body.setDrag( this.throwForce, this.throwForce );
-        this.scene.tweens.add({
-            targets: this,
-            virtualHeight: this.throwHeight,
-            duration: 250,
-            ease: "Quad",
-            onComplete: () => {
-                if (!this || !this.scene) return;
 
-                this.scene.tweens.add({
-                    targets: this,
-                    virtualHeight: 0,
-                    duration: 750,
-                    ease: "Bounce",
-                    onComplete: this.landed,
-                    onCompleteScope: this
-                });
-            }
+        this.scene.tweens.timeline({
+            tweens: [{
+                virtualHeight: this.throwHeight,
+                duration: 250,
+                ease: "Quad"
+            }, {
+                virtualHeight: 0,
+                duration: 750,
+                ease: "Bounce"
+            }],
+            targets: this,
+            onComplete: this.landed,
+            onCompleteScope: this
         });
     }
 

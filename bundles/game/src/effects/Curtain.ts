@@ -59,10 +59,10 @@ export default class Curtain {
         setTimeout( () => {
             this.scene.tweens.add({
                 targets: this,
-                apeture: Math.SQRT1_2,
+                apeture: 1,
                 duration: this.duration,
                 ease: 'Sine',
-                onUpdate: () => this.updateMask( this.camera.centerX, this.camera.centerY, SCREEN_WIDTH_ABS * this.apeture, true ),
+                onUpdate: () => this.updateMask( this.target.x - this.camera.worldView.x, this.target.y - this.camera.worldView.y, SCREEN_WIDTH_ABS * this.apeture, true ),
             })
         }, 100); // small delay
     }

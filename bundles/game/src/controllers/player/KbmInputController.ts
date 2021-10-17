@@ -65,17 +65,12 @@ export default class KbmInputController extends Controller implements UpdateCont
 
         this.input = scene ? scene.input : attached.scene.input;
 
-        const moveController = attached.getController(KbmInputController.moveControllerKey);
-        if (moveController) {
-            this.binds = {
-                up:     this.input.keyboard.addKey( Input.Keyboard.KeyCodes.W ),
-                down:   this.input.keyboard.addKey( Input.Keyboard.KeyCodes.S ),
-                left:   this.input.keyboard.addKey( Input.Keyboard.KeyCodes.A ),
-                right:  this.input.keyboard.addKey( Input.Keyboard.KeyCodes.D ),
-            };
-        } else {
-            console.error("No movement controller found on %s; needed by %s", attached, this);
-        }
+        this.binds = {
+            up:     this.input.keyboard.addKey( Input.Keyboard.KeyCodes.W ),
+            down:   this.input.keyboard.addKey( Input.Keyboard.KeyCodes.S ),
+            left:   this.input.keyboard.addKey( Input.Keyboard.KeyCodes.A ),
+            right:  this.input.keyboard.addKey( Input.Keyboard.KeyCodes.D ),
+        };
     }
 
     public hasUpdateMethod(): true {

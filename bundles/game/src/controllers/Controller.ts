@@ -11,7 +11,7 @@ export interface Attachable extends Referenced, EventEmitter {
     attachController: (ctrl: Controller) => boolean;
     detachController: (ctrl: Controller) => boolean;
 
-    getController: (key: Symbol|Controller) => Controller;
+    // getController: (key: Symbol|Controller) => Controller;   // anti-pattern, don't implement this actually
     hasController: (key: Symbol) => boolean;
 };
 

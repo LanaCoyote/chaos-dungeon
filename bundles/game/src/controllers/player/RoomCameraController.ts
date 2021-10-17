@@ -45,7 +45,16 @@ export default class RoomCameraController extends Controller implements UpdateCo
             console.error("%s is not a LevelScene! Manually set the floor/room or you'll have issues!", attached.scene);
         }
 
-        this.state = STATES.FOLLOWING;
+        this.state = STATES.TRANSITIONING_TO_ROOM;
+        this.scene.time.delayedCall(1000, () => {
+            this.scene.tweens.add({
+                targets: this.attached,
+                y: this.attached.y - TILE_HEIGHT * 3,
+                duration: 750,
+                ease: 'linear',
+                onComplete: this.endTransitionToNewRoom.bind(this)
+            });
+        });
     }
 
     public endTransitionToNewRoom() {
@@ -119,7 +128,7 @@ export default class RoomCameraController extends Controller implements UpdateCo
             duration: 750,
             ease: 'linear',
             onComplete: () => {
-                setTimeout(() => {
+                this.scene.time.delayedCall(100, () => {
                     this.attached.setVisible(false);
                     this.attached.setPosition(this.attached.x - playerMovement.x, this.attached.y - playerMovement.y); 
                     this.nextRoom.preload();
@@ -147,7 +156,7 @@ export default class RoomCameraController extends Controller implements UpdateCo
                         this.camera.worldView.y + this.camera.centerY + cameraMovement.y,
                         1000, 'Linear', true
                     );
-                }, 100);
+                });
             }
         })
     }

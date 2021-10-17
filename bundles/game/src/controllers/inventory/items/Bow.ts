@@ -1,4 +1,4 @@
-import { Math as Vector } from "phaser";
+import { Math as Vector, Physics } from "phaser";
 import { WeaponData } from "./ItemData";
 import PointerItemData from "./PointerItemData";
 import { ITEMCLASS } from "../constants";
@@ -99,6 +99,9 @@ export default class Bow extends PointerItemData implements WeaponData {
         const arrow = new Projectile( equip.scene, eqPos, equip.user, velocity, this.texture, 2 );
         arrow.setDamageInformation( 2, DAMAGETYPES.PHYSICAL );
         arrow.addToDisplayList();
+
+        const arrowBody = arrow.body as Physics.Arcade.Body;
+        arrowBody.setCircle(6, 6 + velocity.x / 250 * -12, 6 + velocity.y / 250 * -12);
 
         const currentRoom = equip.scene.getCurrentFloor().getCurrentRoom();
         currentRoom.addEnemyCollider( arrow );

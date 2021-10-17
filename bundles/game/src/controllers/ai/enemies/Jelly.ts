@@ -5,6 +5,7 @@ import EnemyData from "./EnemyData";
 import JumpingAiController, {JumpingEnemyDataType} from "../JumpingAiController";
 
 import { DEPTH_FLOOR } from "../../../constants";
+import { Types } from "phaser";
 
 export default class Jelly extends EnemyData implements JumpingEnemyDataType {
 
@@ -40,35 +41,13 @@ export default class Jelly extends EnemyData implements JumpingEnemyDataType {
     public onSleep( ai: JumpingAiController ) {
         if (!ai.active) return;
 
-        ai.scene.tweens.add({
-            targets: ai.attached,
-            displayHeight: this.squishHeight,
-            duration: 50,
-            yoyo: true,
-            repeat: 2,
-            ease: 'bounce',
-            onComplete: () => {
-                if (!ai.attached) return;
-                ai.attached.displayHeight = this.initialHeight;
-            }
-        });
+        ai.scene.tweens.add(this.jiggleConfiggle( ai.attached ));
     }
 
     public onDecideToJump( ai: JumpingAiController ) {
         if (!ai.active) return;
 
-        ai.scene.tweens.add({
-            targets: ai.attached,
-            displayHeight: this.squishHeight,
-            duration: 50,
-            yoyo: true,
-            repeat: 3,
-            ease: 'bounce',
-            onComplete: () => {
-                if (!ai.attached) return;
-                ai.attached.displayHeight = this.initialHeight;
-            }
-        });
+        ai.scene.tweens.add(this.jiggleConfiggle( ai.attached ));
     }
 
     public onJump( ai: JumpingAiController ) {
@@ -80,14 +59,28 @@ export default class Jelly extends EnemyData implements JumpingEnemyDataType {
             duration: this.jumpDuration / 2,
             yoyo: true,
             ease: 'Sine',
-            onComplete: () => {
-                if (!ai.attached) return;
-                ai.attached.displayHeight = this.initialHeight;
-            }
+            onComplete: this.resetHeight.bind(this, ai.attached),
         });
     }
 
     public onShortHop( ai: JumpingAiController ) {
 
+    }
+
+    private resetHeight( attached: Actor ) {
+        if (!attached) return
+        attached.displayHeight = this.initialHeight;
+    }
+
+    private jiggleConfiggle( attached: Actor ): Types.Tweens.TweenBuilderConfig {
+        return {
+            targets: attached,
+            displayHeight: this.squishHeight,
+            duration: 50,
+            yoyo: true,
+            repeat: 2,
+            ease: 'bounce',
+            onComplete: this.resetHeight.bind(this, attached),
+        } as Types.Tweens.TweenBuilderConfig;
     }
 }

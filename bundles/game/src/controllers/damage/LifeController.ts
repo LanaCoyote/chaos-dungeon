@@ -1,4 +1,4 @@
-import { Math as Vector } from "phaser";
+import { Data, Math as Vector } from "phaser";
 
 import DamageableController from "./DamageableController";
 import Actor from "../../objects/actors/Actor";
@@ -7,6 +7,8 @@ import SpawnCloud from "../../effects/SpawnCloud";
 
 import { EVENTS as DAMAGE_EVENTS, DAMAGETYPES } from "./constants";
 import { EVENTS as MOVEMENT_EVENTS } from "../physics/MovementController";
+
+export const LIFE_DATA_KEY = "LIFE";
 
 export default class LifeController extends DamageableController {
 
@@ -18,6 +20,7 @@ export default class LifeController extends DamageableController {
 
         this.maxLife = life;
         this.life = this.maxLife;
+        this.attached.setData(LIFE_DATA_KEY, this.life);
     }
 
     public onPreventDamage(amount: number, type: DAMAGETYPES, source: Actor) {
@@ -26,11 +29,13 @@ export default class LifeController extends DamageableController {
 
     public onHealDamage(amount: number) {
         this.life = Math.min( this.life + amount, this.maxLife );
+        this.attached.setData(LIFE_DATA_KEY, this.life);
     }
 
     public onTakeDamage(amount: number, type: DAMAGETYPES, source: Actor) {
         // take health
         this.life = this.life - amount;
+        this.attached.setData(LIFE_DATA_KEY, this.life);
         
         // knock back from source
         const hitPos = new Vector.Vector2( source.x, source.y );

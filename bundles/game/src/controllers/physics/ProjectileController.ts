@@ -16,6 +16,24 @@ export default class ProjectileController extends ArcadePhysicsController {
         this.shooter = shooter;
         this.velocity = velocity;
         this.body.onOverlap = true;
+
+        // this allows us to shoot through corners
+        // generally better game feel
+        this.wallCollider.active = false;
+        this.scene.time.delayedCall(250, () => {
+            if (!this || !this.scene || !this.wallCollider) return;
+
+            if (this.scene.getCurrentFloor().tilemap.getTileAtWorldXY(this.body.x, this.body.y).collides) {
+                this.attached.destroy();
+            } else {
+                this.wallCollider.active = true;
+                this.wallCollider.collideCallback = () => {
+                    this.attached.destroy();
+                };
+            }
+        });
+
+        
     }
 
     public activate() {

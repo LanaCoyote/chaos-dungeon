@@ -99,11 +99,12 @@ export default class LevelScene extends Scene {
 
         this.floors[0].activate();
 
-        const player = new Hero(this, new Vector.Vector2(f1.getCurrentRoom().rect.centerX, f1.getCurrentRoom().rect.bottom - TILE_HEIGHT * 2));
+        const player = new Hero(this, new Vector.Vector2(f1.getCurrentRoom().rect.centerX, f1.getCurrentRoom().rect.bottom));
         player.addToDisplayList();
         player.addToUpdateList();
+        player.deactivateAllControllers();
         
-        this.physics.add.collider(player, f1.tilemap.getLayer(0).tilemapLayer);
+        // this.physics.add.collider(player, f1.tilemap.getLayer(0).tilemapLayer);
 
         const sword = InventoryController.EquippedItems[0];
         const shield = InventoryController.EquippedItems[1];
@@ -143,10 +144,11 @@ export default class LevelScene extends Scene {
 
         this.gameUI = new GameUI(this, uiCamera);
 
-        setTimeout(() => {
-            // f1.tilemap.putTilesAt([[1,1],[1,1]], 49, 39, true)
+        this.time.delayedCall(2000, () => {
+            f1.tilemap.putTilesAt([[100,101,102]], 51, 58, true);
             f1.getCurrentRoom().activate();
-        }, 1000)
+            player.reactivateAllControllers();
+        });
     }
 
     public update(time: number, delta: number) {
