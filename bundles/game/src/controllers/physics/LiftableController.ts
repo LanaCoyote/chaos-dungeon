@@ -28,7 +28,7 @@ export default class LiftableController extends ArcadePhysicsController implemen
     private virtualHeight: number = 0;
 
     constructor( attached: Liftable, scene?: Scene, lifter?: Actor ) {
-        super( attached, scene );
+        super( attached, scene, true );
 
         this.on( EVENTS.LIFT, this.lift.bind(this) );
         this.on( EVENTS.THROW, this.throw.bind(this) );

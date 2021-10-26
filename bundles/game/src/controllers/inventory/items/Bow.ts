@@ -93,10 +93,12 @@ export default class Bow extends PointerItemData implements WeaponData {
         this.shootTime = 300;
 
         equip.setFrame(1);
+        equip.scene.sound.play("sfx/shoot");
 
         const eqPos = new Vector.Vector2( equip.x, equip.y );
         const velocity = PointerItemData.getMousePosition( equip.scene ).subtract( eqPos ).setLength( 250 );
         const arrow = new Projectile( equip.scene, eqPos, equip.user, velocity, this.texture, 2 );
+        arrow.z = equip.user.z;
         arrow.setDamageInformation( 2, DAMAGETYPES.PHYSICAL );
         arrow.addToDisplayList();
 

@@ -2,7 +2,7 @@ import { Cameras, Math as Vec } from "phaser";
 
 import Controller, { UpdateController } from "../Controller";
 import { SCREEN_HEIGHT, SCREEN_HEIGHT_ABS, SCREEN_WIDTH_ABS, TILE_HEIGHT, TILE_WIDTH } from "../../constants";
-import Actor from "../../objects/actors/Actor";
+import Hero from "../../objects/actors/Hero";
 import LevelScene from "../../scenes/level/LevelScene";
 import Floor from "../../scenes/level/Floor";
 import Room from "../../scenes/level/Room";
@@ -16,7 +16,7 @@ export enum STATES {
 
 export default class RoomCameraController extends Controller implements UpdateController {
 
-    public attached: Actor;
+    public attached: Hero;
     public camera: Cameras.Scene2D.Camera;
     public floor: Floor;
     public room: Room;
@@ -24,7 +24,7 @@ export default class RoomCameraController extends Controller implements UpdateCo
     public scene: LevelScene;
     public state: STATES;
 
-    constructor(attached: Actor, camera?: Cameras.Scene2D.Camera) {
+    constructor(attached: Hero, camera?: Cameras.Scene2D.Camera) {
         super(attached, attached.scene);
 
         if (camera) {
@@ -66,6 +66,9 @@ export default class RoomCameraController extends Controller implements UpdateCo
         this.state = STATES.FOLLOWING;
 
         this.attached.reactivateAllControllers();
+        this.attached.setRespawnPosition( this.attached.x, this.attached.y );
+        this.attached.body.setBoundsRectangle( this.room.rect );
+        this.attached.body.setCollideWorldBounds( true );
     }
 
     public hasUpdateMethod(): true {

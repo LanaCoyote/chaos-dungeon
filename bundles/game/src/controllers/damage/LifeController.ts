@@ -1,4 +1,4 @@
-import { Data, Math as Vector } from "phaser";
+import { Data, Math as Vector, Physics } from "phaser";
 
 import DamageableController from "./DamageableController";
 import Actor from "../../objects/actors/Actor";
@@ -38,18 +38,24 @@ export default class LifeController extends DamageableController {
         this.attached.setData(LIFE_DATA_KEY, this.life);
         
         // knock back from source
-        const hitPos = new Vector.Vector2( source.x, source.y );
-        const repulsion = new Vector.Vector2( this.attached.x, this.attached.y ).subtract( hitPos );
+        const sourceBody: {x: number, y: number} = (source.body as Physics.Arcade.Body) || source; 
+        const thisBody: {x: number, y: number} = (this.attached.body as Physics.Arcade.Body) || this.attached;
+        const hitPos = new Vector.Vector2( sourceBody.x, sourceBody.y );
+        const repulsion = new Vector.Vector2( thisBody.x, thisBody.y ).subtract( hitPos );
         repulsion.setLength( this.repulsionLength );
 
         // flicker effect
         new Flicker( this.attached, this.invulnPeriod );
         this.attached.emit( MOVEMENT_EVENTS.SHOVE, repulsion );
+        this.scene.sound.play("sfx/hit_enemy");
 
         // did we die?
         if (this.life <= 0) {
             this.scene.time.delayedCall(250, () => {
-                if (this && this.isAttached()) this.die(amount, type, source);
+                if (this && this.isAttached()) {
+                    this.scene.sound.play("sfx/hit_kill");
+                    this.die(amount, type, source);
+                }
             });
         }
     }

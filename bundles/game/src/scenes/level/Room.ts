@@ -16,10 +16,19 @@ export interface EnemyGroup {
     count: number;
     defeated?: number;
     enemyData?: EnemyData;
+    id?: Symbol;
     spawnArea?: Geom.Rectangle;
 }
 
+export interface LastRoomData {
+    key: string;
+    enemiesRemaining: Map<Symbol, number>;
+}
+
 export default class Room {
+
+    private static lastRoomData: LastRoomData;
+    private static lastLastRoomData: LastRoomData;
 
     public rect: Geom.Rectangle;
 
@@ -38,7 +47,10 @@ export default class Room {
         this.rect = rect;
         this.key = key;
 
-        this.enemyGroups = enemyGroups;
+        this.enemyGroups = enemyGroups.map(group => {
+            group.id = Symbol("[EnemyGroup]");
+            return group;
+        });
 
         if (rect.width < MINIMUM_EXPECTED_WIDTH || rect.height < MINIMUM_EXPECTED_HEIGHT) {
             console.error("Creating a room of size (%d x %d) smaller than minimum size (%d x %d)",
@@ -56,6 +68,7 @@ export default class Room {
         });
 
         this.enemyColliders.length = 0;
+        Room.lastRoomData = this.saveLastRoomData();
         this.destroyEnemies();
     }
 
@@ -105,6 +118,30 @@ export default class Room {
         }
     }
 
+    public saveLastRoomData(): LastRoomData {
+        const data: LastRoomData = {
+            key: this.key,
+            enemiesRemaining: new Map()
+        };
+
+        this.enemies.children.each((enemy: Enemy) => {
+            if (!enemy || !enemy.groupId || !enemy.active) return;
+
+            const curRemaining = data.enemiesRemaining.get(enemy.groupId);
+            if (curRemaining) {
+                data.enemiesRemaining.set(enemy.groupId, curRemaining + 1);
+            } else {
+                data.enemiesRemaining.set(enemy.groupId, 1);
+            }
+        });
+
+        this.enemyGroups.forEach(group => {
+            group.defeated = Math.max(group.count - (data.enemiesRemaining.get(group.id) || 0), 0);
+        });
+
+        return data;
+    }
+
     public toString(): string {
         return `[Room ${this.key}]`;
     }
@@ -120,6 +157,7 @@ export default class Room {
 
         this.enemyGroups.forEach(enemyGroup => {
             if (!enemyGroup.defeated) enemyGroup.defeated = 0;
+
             if (!enemyGroup.enemyData) {
                 enemyGroup.enemyData = new enemyGroup.EnemyDataClass();
 
@@ -128,9 +166,10 @@ export default class Room {
                 }
             }
 
-            for (let i = enemyGroup.defeated; i < enemyGroup.count; ++i) {
+            for (let i = (Room.lastRoomData && Room.lastRoomData.key === this.key ? enemyGroup.defeated : 0); i < enemyGroup.count; ++i) {
                 const spawnPos = defaultSpawnArea.getRandomPoint();
                 const enemyActor = new Enemy( this.scene, new Vector.Vector2( spawnPos.x, spawnPos.y ), enemyGroup.enemyData );
+                enemyActor.groupId = enemyGroup.id;
                 enemies.push( enemyActor );
             }
         });

@@ -5,7 +5,7 @@ import EnemyData from "./enemies/EnemyData";
 import Hero from "../../objects/actors/Hero";
 import LevelScene from "../../scenes/level/LevelScene";
 
-import { DEPTH_FLOOR, DEPTH_FLYING, IMPORTANT_TILES } from "../../constants";
+import { DEPTH_FLOOR, DEPTH_FLYING, IMPORTANT_TILES, LAYER_LOWER, LAYER_WATER } from "../../constants";
 import MovementController, { EVENTS as MOVEMENT_EVENTS } from "../physics/MovementController";
 
 export enum JumpingEnemyStates {
@@ -101,10 +101,16 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
         for (let i = 0; i < 30 && !pointIsValid; ++i) {
             nextPoint = jumpableRadius.getRandomPoint( nextPoint );
             pointIsValid = currentFloor.getCurrentRoom().rect.contains( nextPoint.x, nextPoint.y );
+
             if (pointIsValid && !this.data.canLandOnWalls) {
-                if (currentFloor.tilemap.getTileAtWorldXY( nextPoint.x, nextPoint.y ).collides) {
+                let targetTile = currentFloor.tilemap.getTileAtWorldXY( nextPoint.x, nextPoint.y );
+                if (currentFloor.tilemap.getTileAtWorldXY( nextPoint.x, nextPoint.y, true, undefined ).collides) {
                     pointIsValid = false;
-                } 
+                } else if (currentFloor.tilemap.getTileAtWorldXY( nextPoint.x, nextPoint.y, true, undefined, LAYER_LOWER ).collides) {
+                    pointIsValid = false;
+                } else if (currentFloor.tilemap.getTileAtWorldXY( nextPoint.x, nextPoint.y, true, undefined, LAYER_WATER ).collides) {
+                    pointIsValid = false;
+                }
             }
         }
 
@@ -117,6 +123,7 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
         const xMovement = destination.x - this.attached.x;
         this.attached.setBaseDepth( DEPTH_FLYING );
         this.attached.emit( MOVEMENT_EVENTS.SHOVE, new Vector.Vector2( xMovement, this.data.jumpHeight * -1 ) );
+        this.attached.z = 1;
 
         this.scene.tweens.add({
             targets: this.attached,
@@ -142,6 +149,7 @@ export default class JumpingAiController extends AiController<JumpingEnemyDataTy
             onComplete: () => {
                 if (!this.attached) return;
                 this.attached.setBaseDepth( DEPTH_FLOOR );
+                this.attached.z = 0;
             }
         });
     }

@@ -88,6 +88,8 @@ export default class Sword extends PointerItemData implements WeaponData {
             ease: 'Sine',
             onComplete: () => this.donePowerAttak(equip)
         });
+
+        equip.scene.sound.play("sfx/slash_big");
     }
 
     public onEquip(equip: Equipment) {
@@ -170,6 +172,8 @@ export default class Sword extends PointerItemData implements WeaponData {
                 duration: 50,
                 ease: "Sine"
             });
+
+            equip.scene.sound.play("sfx/slash");
 
             const qspinTarget = PointerItemData.getMousePosition( equip.scene );
             this.quickspinAxisVertical = Math.abs( qspinTarget.y ) > Math.abs( qspinTarget.x );

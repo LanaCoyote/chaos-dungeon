@@ -23,6 +23,8 @@ export default class Dynamite extends ItemData {
 
     public explosion( equip: Equipment, location: Vector.Vector2 ) {
         const circle = new Geom.Circle( location.x, location.y, 60 );
+
+        equip.scene.sound.play("sfx/bomb");
         
         equip.scene.getCurrentFloor().getCurrentRoom().getEnemyGroup().getChildren().forEach((enemy: Enemy) => {
             if (circle.contains(enemy.x, enemy.y)) {
@@ -59,6 +61,7 @@ export default class Dynamite extends ItemData {
     public onShoot( equip: Equipment ) {
         if (!this.bomb) {
             this.bomb = new Liftable( equip.scene, new Vector.Vector2( equip.user.x, equip.user.y ), this.texture );
+            this.bomb.x = equip.user.x;
             this.bomb.addToDisplayList();
             this.bomb.emit( LIFT_EVENTS.LIFT, equip.user );
 

@@ -19,6 +19,7 @@ export default class DamageableEnemyController extends LifeController {
         super( attached, data.life );
 
         this.enemyData = data;
+        this.repulsionLength = 1000;
         if (this.enemyData.damageOnTouch) {
             this.touchDamageDealer = new TouchDamageEnemyController( attached, data, this );
         }

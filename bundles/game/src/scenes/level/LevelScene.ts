@@ -37,6 +37,7 @@ export default class LevelScene extends Scene {
 
     public preload() {
         this.load.image("tilesets/placeholder_tiles", "tiles");
+        this.load.image("tilesets/placeholder_water", "water");
         this.load.image("actors/hero", "static/bear.png");
         this.load.image("actors/ralsei", "static/ralsei.png");
         this.load.image("actors/item/pickups", "static/pickups.png");
@@ -56,6 +57,15 @@ export default class LevelScene extends Scene {
 
         this.load.tilemapCSV("tilemaps/F1", "level/f1.csv");
         this.load.json("data/level", "level/data.json");
+        
+        this.load.audio("music/mtkat", ["static/mtkat_placeholder.ogg", "static/mtkat_placeholder.mp3"]);
+        this.load.audio("sfx/door_shut", "static/door_shut.wav");
+        this.load.audio("sfx/slash", "static/slash.wav");
+        this.load.audio("sfx/slash_big", "static/slash_big.wav");
+        this.load.audio("sfx/shoot", "static/shoot.wav");
+        this.load.audio("sfx/bomb", "static/bomb.wav");
+        this.load.audio("sfx/hit_enemy", "static/hit_enemy.wav");
+        this.load.audio("sfx/hit_kill", "static/hit_kill.wav");
 
         // this.scale.scaleMode = Scale.RESIZE;
     }
@@ -148,6 +158,10 @@ export default class LevelScene extends Scene {
             f1.tilemap.putTilesAt([[100,101,102]], 51, 58, true);
             f1.getCurrentRoom().activate();
             player.reactivateAllControllers();
+            player.setRespawnPosition(player.x, player.y);
+
+            this.sound.play('sfx/door_shut');
+            this.sound.play('music/mtkat', {loop: true, volume: 0.5});
         });
     }
 

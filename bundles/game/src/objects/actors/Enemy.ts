@@ -18,6 +18,7 @@ export default class Enemy extends Actor {
     public body: Physics.Arcade.Body;
     public damage: DamageableEnemyController;
     public enemyData: EnemyData;
+    public groupId?: Symbol;
     public move: MovementController;
 
     constructor( scene: Scene, origin: Vector.Vector2, enemyData: EnemyData, texture?: string ) {   // TODO: rewrite using a new ()=>type expression instead of the createController method
@@ -28,8 +29,8 @@ export default class Enemy extends Actor {
         this.damage = new DamageableEnemyController(this, enemyData);
 
         this.setVisible( false );
-        this.scene.physics.add.overlap( this, Equipment.living );
-        this.scene.physics.add.overlap( this, Hero.activeHero );
+        // this.scene.physics.add.overlap( this, Equipment.living );
+        // this.scene.physics.add.overlap( this, Hero.activeHero );
 
         this.on( DAMAGE_EVENTS.DIED, () => {
             if (Math.random() > 0.25) return;

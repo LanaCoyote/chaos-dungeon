@@ -47,7 +47,6 @@ export default class Equipment extends Actor {
         this.damage.activate();
 
         Equipment.living.push( this );
-        console.log(Equipment.living);
 
         if (this.item) {
             this.item.onEquip( this );

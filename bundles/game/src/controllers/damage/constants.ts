@@ -19,6 +19,8 @@ export enum DAMAGETYPES {
     FIRE,           // fire damage from fire arrows, fire rod, and lantern
     ICE,            // ice damage from ice arrows and ice rod
     ELECTRIC,       // elec damage from elec arrows and elec rod
+    DROWN,          // drowning in a body of water
+    FALL,           // falling in a pit
     DEATH,          // potentially instant death. prevents the kill event from instantly killing
     UNMITIGATABLE,  // nothing can stop it
 }

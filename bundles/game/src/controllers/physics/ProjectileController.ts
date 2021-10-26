@@ -11,7 +11,7 @@ export default class ProjectileController extends ArcadePhysicsController {
     public velocity: Vector.Vector2;
 
     constructor( attached: Actor, shooter?: Actor, velocity?: Vector.Vector2 ) {
-        super( attached, attached.scene );
+        super( attached, attached.scene, true );
 
         this.shooter = shooter;
         this.velocity = velocity;
@@ -23,15 +23,19 @@ export default class ProjectileController extends ArcadePhysicsController {
         this.scene.time.delayedCall(250, () => {
             if (!this || !this.scene || !this.wallCollider) return;
 
-            if (this.scene.getCurrentFloor().tilemap.getTileAtWorldXY(this.body.x, this.body.y).collides) {
-                this.attached.destroy();
+            if (this.scene.getCurrentFloor().tilemap.getTileAtWorldXY(this.body.x, this.body.y, true).collides) {
+                if (this.attached) this.attached.destroy();
             } else {
                 this.wallCollider.active = true;
                 this.wallCollider.collideCallback = () => {
-                    this.attached.destroy();
+                    if (this.attached) this.attached.destroy();
                 };
             }
         });
+
+        this.lowerWallCollider.collideCallback = () => {
+            if (this.attached) this.attached.destroy();
+        };
 
         
     }

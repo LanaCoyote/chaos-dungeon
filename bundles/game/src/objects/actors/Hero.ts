@@ -8,6 +8,7 @@ import MovementController from "../../controllers/physics/MovementController";
 import KbmInputController from "../../controllers/player/KbmInputController";
 import VirtualInputController from "../../controllers/player/VirtualInputController";
 import RoomCameraController from "../../controllers/player/RoomCameraController";
+import LevelScene from "../../scenes/level/LevelScene";
 
 export default class Hero extends Actor {
 
@@ -15,8 +16,11 @@ export default class Hero extends Actor {
 
     public body: Physics.Arcade.Body;
     public damage: DamageablePlayerController;
+    public scene: LevelScene;
+    
+    private respawnPoint: Vectors.Vector2;
 
-    constructor(scene: Scene, origin: Vectors.Vector2) {
+    constructor(scene: LevelScene, origin: Vectors.Vector2) {
         super(scene, origin, "hero");
 
         const movementController = new MovementController(this);
@@ -52,6 +56,21 @@ export default class Hero extends Actor {
             this.setBaseDepth( DEPTH_FLOOR + 2 );
 
             setInterval(() => this.setFlipX(!this.flipX), 250);
+        });
+    }
+
+    public setRespawnPosition(x: number, y: number) {
+        this.respawnPoint = new Vectors.Vector2(x, y);
+    }
+
+    public respawn() {
+        this.scene.getCurrentFloor().getCurrentRoom().deactivate();
+        this.scene.getCurrentFloor().getCurrentRoom().unload();
+        this.body.setBoundsRectangle( this.scene.getCurrentFloor().getCurrentRoom().rect );
+        this.setPosition( this.respawnPoint.x, this.respawnPoint.y, 0 );
+        this.scene.getCurrentFloor().getCurrentRoom().preload();
+        this.scene.time.delayedCall(1000, () => {
+            this.scene.getCurrentFloor().getCurrentRoom().activate();
         });
     }
 

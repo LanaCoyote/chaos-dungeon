@@ -88,7 +88,6 @@ export default class GameUI extends GameObjects.Container {
             subscreen.setVisible(!subscreen.visible);
             scene.time.paused = !scene.time.paused;
             if (scene.time.paused) scene.tweens.pauseAll();
-            console.log("paused:", scene.time.paused);
         });
     }
 

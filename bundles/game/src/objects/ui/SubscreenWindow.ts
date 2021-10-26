@@ -17,8 +17,6 @@ export default class SubscreenWindow extends GameObjects.Rectangle {
         const bounds = new Geom.Rectangle( camera.worldView.left + w/2, camera.worldView.top + h/2, w, h );
         super( scene, SCREEN_WIDTH_ABS / 2, SCREEN_HEIGHT_ABS * 0.6, w, h, 0, 1 );
 
-        console.log(bounds);
-        console.log(this.getTopLeft());
         this.setStrokeStyle( 4, strokeColor, 1 );
         // this.setPosition( bounds.left, bounds.right );
     }

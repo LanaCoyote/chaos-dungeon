@@ -3,7 +3,7 @@ import { Math, Scene } from "phaser";
 import ArcadePhysicsController from "./ArcadePhysicsController";
 import { UpdateController } from "../Controller";
 import Actor from "../../objects/actors/Actor";
-import { MOVESTATE } from "../../constants";
+import { IMPORTANT_TILES, MOVESTATE, TILE_WIDTH } from "../../constants";
 
 export const EVENTS = {
     MOVE: Symbol("[Event Move]"),
@@ -76,10 +76,14 @@ export default class MovementController extends ArcadePhysicsController implemen
     }
 
     public move(velocity: Math.Vector2) {
+        if (this.pushingIntoWall(velocity)) return;
+
         this.intents.push(velocity);
     }
 
     public shove(velocity: Math.Vector2) {
+        if (this.pushingIntoWall(velocity, true)) return;
+
         if (!this.impulse) {
             this.impulse = velocity;
         } else {
@@ -124,7 +128,9 @@ export default class MovementController extends ArcadePhysicsController implemen
         if (this.state === MOVESTATE.IMPULSE) {
             if (this.body.velocity.lengthSq() < this.maxSpeed * this.maxSpeed) {
                 this.state = MOVESTATE.STOPPING;
+                this.attached.z = 0;
             } else {
+                this.attached.z = 1;
                 this.body.setAcceleration(-this.body.velocity.x * this.decelRate, -this.body.velocity.y * this.decelRate);
             }
         } else if (this.state === MOVESTATE.FROZEN) {
@@ -177,6 +183,26 @@ export default class MovementController extends ArcadePhysicsController implemen
                 this.body.setAcceleration(-this.body.velocity.x * this.decelRate, -this.body.velocity.y * this.decelRate);
             }
         }
+    }
+
+    private pushingIntoWall(velocity: Math.Vector2, deepCheck?: boolean): boolean {
+        if (velocity.y < 0 && this.body.onCeiling()) return true;
+        if (velocity.y > 0 && this.body.onFloor()) return true;
+        if (velocity.x !== 0 && this.body.onWall()) return true;
+
+        if (deepCheck) {
+            const extraDist = velocity.clone().setLength(TILE_WIDTH);
+            const checkPos = new Math.Vector2(this.body.x + extraDist.x, this.body.y + extraDist.y);
+            const tile = this.scene.getCurrentFloor().tilemap.getTileAtWorldXY(checkPos.x, checkPos.y);
+
+            if (tile) {
+                return IMPORTANT_TILES.WALL.includes(tile.index)
+                    || IMPORTANT_TILES.OBSTACLE.includes(tile.index)
+                    || this.attached.z < 0 && IMPORTANT_TILES.LOWER_WALL.includes(tile.index);
+            }
+        }
+
+        return false;
     }
 
 }
