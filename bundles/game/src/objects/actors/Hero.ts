@@ -24,10 +24,10 @@ export default class Hero extends Actor {
         super(scene, origin, "hero");
 
         const movementController = new MovementController(this);
-        movementController.acceleration = 800;
-        movementController.maxSpeed = 180;
-        movementController.intentWeight = 35;
-        movementController.decelRate = 15;
+        movementController.acceleration = 100;
+        movementController.maxSpeed = 150;
+        movementController.intentWeight = 1;
+        movementController.decelRate = 30;
         movementController.activate();
 
         const damageController = new DamageablePlayerController(this);

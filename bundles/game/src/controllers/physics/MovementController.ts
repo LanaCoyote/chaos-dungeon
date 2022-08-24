@@ -1,4 +1,4 @@
-import { Math, Scene } from "phaser";
+import { Math as PhaserMath, Scene } from "phaser";
 
 import ArcadePhysicsController from "./ArcadePhysicsController";
 import { UpdateController } from "../Controller";
@@ -23,16 +23,16 @@ export default class MovementController extends ArcadePhysicsController implemen
     public maxSpeed: number = 120;
     public currentMaxSpeed: number;
 
-    private intents: Array<Math.Vector2> = [];
-    private impulse: Math.Vector2;
+    private intents: Array<PhaserMath.Vector2> = [];
+    private impulse: PhaserMath.Vector2;
     private state: MOVESTATE;
 
     constructor(actor?: Actor, scene?: Scene) {
         super(actor, scene);
 
         this.currentMaxSpeed = this.maxSpeed;
-        this.on(EVENTS.MOVE, (velocity: Math.Vector2) => this.move(velocity));
-        this.on(EVENTS.SHOVE, (velocity: Math.Vector2) => this.shove(velocity));
+        this.on(EVENTS.MOVE, (velocity: PhaserMath.Vector2) => this.move(velocity));
+        this.on(EVENTS.SHOVE, (velocity: PhaserMath.Vector2) => this.shove(velocity));
         this.on(EVENTS.FREEZE, (duration: number) => this.freeze(duration));
         this.on(EVENTS.UNFREEZE, () => this.unfreeze());
         this.on(EVENTS.SLOW, (speed: number) => this.slow(speed));
@@ -75,13 +75,13 @@ export default class MovementController extends ArcadePhysicsController implemen
         }
     }
 
-    public move(velocity: Math.Vector2) {
+    public move(velocity: PhaserMath.Vector2) {
         if (this.pushingIntoWall(velocity)) return;
 
         this.intents.push(velocity);
     }
 
-    public shove(velocity: Math.Vector2) {
+    public shove(velocity: PhaserMath.Vector2) {
         if (this.pushingIntoWall(velocity, true)) return;
 
         if (!this.impulse) {
@@ -161,11 +161,25 @@ export default class MovementController extends ArcadePhysicsController implemen
                 composite.y = composite.y * this.acceleration * this.intentWeight;
 
                 // apply the acceleration to the physics body
-                let newAcceleration = composite.subtract(this.body.acceleration);//this.body.acceleration.add(composite);
-                if (newAcceleration.lengthSq() > this.acceleration * this.acceleration) {
-                    newAcceleration.setLength(this.acceleration);
+                // let newAcceleration = composite.subtract(this.body.acceleration);//this.body.acceleration.add(composite);
+                // if (newAcceleration.lengthSq() > this.acceleration * this.acceleration) {
+                //     newAcceleration.setLength(this.acceleration);
+                // }
+
+                let lastVelocity = this.body.velocity;
+                // snap to cardinals
+                if (Math.abs(lastVelocity.x) < 1) {
+                    lastVelocity.x = 0;
                 }
-                this.body.setAcceleration(newAcceleration.x, newAcceleration.y);
+                if (Math.abs(lastVelocity.y) < 1) {
+                    lastVelocity.y = 0;
+                }
+
+                this.body.setAcceleration(composite.x, composite.y);
+                this.body.setVelocity(
+                    lastVelocity.x + composite.x * delta,
+                    lastVelocity.y + composite.y * delta
+                );
 
                 // cap movement speed
                 if (this.body.velocity.lengthSq() > this.currentMaxSpeed * this.currentMaxSpeed) {
@@ -185,14 +199,14 @@ export default class MovementController extends ArcadePhysicsController implemen
         }
     }
 
-    private pushingIntoWall(velocity: Math.Vector2, deepCheck?: boolean): boolean {
+    private pushingIntoWall(velocity: PhaserMath.Vector2, deepCheck?: boolean): boolean {
         if (velocity.y < 0 && this.body.onCeiling()) return true;
         if (velocity.y > 0 && this.body.onFloor()) return true;
         if (velocity.x !== 0 && this.body.onWall()) return true;
 
         if (deepCheck) {
             const extraDist = velocity.clone().setLength(TILE_WIDTH);
-            const checkPos = new Math.Vector2(this.body.x + extraDist.x, this.body.y + extraDist.y);
+            const checkPos = new PhaserMath.Vector2(this.body.x + extraDist.x, this.body.y + extraDist.y);
             const tile = this.scene.getCurrentFloor().tilemap.getTileAtWorldXY(checkPos.x, checkPos.y);
 
             if (tile) {
